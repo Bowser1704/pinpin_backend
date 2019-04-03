@@ -1,0 +1,483 @@
+#coding=utf-8
+
+import requests
+import os
+import simplejson as json
+from flask import jsonify, request
+import datetime
+import qiniu.config
+
+from qiniu import Auth, put_file, etag, urlsafe_base64_encode
+from . import api
+from .. import db
+from ..login import get_id
+from ..models import Comment, Orderbuy, Ordercar, User,Post2order,Pick2order
+
+#添加订单,获取订单，加入订单。
+@api.route('/order/buy/',methods=['POST'，'GET'])
+@User.check
+def add_order(openid):
+    orderID = request.args.get("orderID",-1,type=int)
+    if request.method=='POST':    
+        if orderID==-1:
+            #添加订单
+            data=request.get_json()
+            order=Orderbuy(postID=openid,datetime=datetime.datetime.utcnow())
+            order.kind=data.get('kind')
+            order.location=data.get('location')
+            order.time=data.get('timeBuy')
+            order.numNeed=data.get('numNeed')
+            order.heading=data.get('heading')
+            order.content=data.get('content')
+            order.tel=data.get('tel')
+            order.qq=data.get('qq')
+            order.wecaht=data.get('wechat')
+            order.picture=data.get('picture')
+            #；隔开每一个picture_url
+            #内容非必填
+            #联系方式加入订单三个字段
+            order.numExist=1
+            db.session.add(order)
+            db.session.commit()
+            orderID=order.id
+            p2order = Post2order(kind=1,userID=openid,orderID=orderID)
+            db.session.add(p2order)
+            db.session.commit()
+            return jsonify({
+                'orderID':orderID
+            }),200
+        
+        else:
+            #加入订单
+            order = Orderbuy.query.filter_by(id=orderID).first()
+            userID = request.form['userID']
+            #保险机制，确保加入订单
+            if userID==openid:
+                if order.numExist >= order.numNeed:
+                    return jsonify({
+                        "msg":"order is full"
+                    }),403
+                
+                if order.postID== str(openid):
+                    return jsonify({
+                        "msg":"you are the poster"
+                    }),403
+
+                if order.postID!= str(openid):
+                    order.numExist+=1
+                    p=Pick2order(kind=1,userID=openid,orderID=orderID)
+                    db.session.add(p,order)
+                    db.session.commit()
+                    way = {
+                        'tel':order.tel,
+                        "wechat":order.wechat,
+                        "qq":order.qq
+                    }
+                    return jsonify({
+                        'way':way
+                    }),200
+
+    if request.method=="GET":
+        order = Orderbuy.query.filter_by(id=orderID).first()
+        info={
+        'datetime' : order.datetime,
+        'kind' : order.kind,
+        'location' : order.location,
+        'timeBuy' : order.time,
+        'picture' : order.picture,
+        'heading' : order.heading,
+        'content' : order.content,
+        'numNeed': order.numNeed,
+        'numExist' : order.numExist
+        }
+        p2order=Pick2order.query.filter_by(kind=1, orderID=orderID).all()
+        userPicture=[]
+        postUser = User.query.filter_by(openid=order.postID).first()
+        userPicture.append(postUser.headPicture)
+        for u in u2order:
+            us=User.query.filter_by(openid=u.user_id).first()
+            userPicture.append(us.headpicture)
+        userspicture={
+            'userpictures': userPicture
+        }
+        commentss=Comment.query.filter_by(orderbuyID=orderID).all()
+        comments=[]
+        for c in commentss:
+            us = User.query.filter_by(openid=c.userID)
+            x={
+                'datetime':c.datetime,
+                'content':c.content,
+                'headpicture':us.headpicture,
+                'username':us.username
+            }
+            comments.append(x)
+
+        data=[info,userPicture,comments]
+        return jsonify({
+            'data':data
+        }),200
+
+
+
+#添加订单,获取订单，加入订单。
+@api.route('/order/car/',methods=['POST'])
+@User.check
+def add_order(openid):
+    orderID = request.args.get("orderID",-1,type=int)
+    if request.method=='POST':    
+        if orderID==-1:
+            #添加订单
+            data=request.get_json()
+            order=Ordercar(postID=openid,datetime=datetime.datetime.utcnow())
+            order.placeB=data.get('placeB')
+            order.placeA=data.get('placeA')
+            order.time=data.get('timeGo')
+            order.numNeed=data.get('numNeed')
+            order.heading=data.get('heading')
+            order.content=data.get('content')
+            order.tel=data.get('tel')
+            order.qq=data.get('qq')
+            order.wecaht=data.get('wechat')
+            #；隔开每一个picture_url
+            #内容非必填
+            #联系方式加入订单三个字段
+            order.numExist=1
+            db.session.add(order)
+            db.session.commit()
+            orderID=order.id
+            p2order = Post2order(kind=2,userID=openid,orderID=orderID)
+            db.session.add(p2order)
+            db.session.commit()
+            return jsonify({
+                'orderID':orderID
+            }),200
+        
+        else:
+            #加入订单
+            order = Ordercar.query.filter_by(id=orderID).first()
+            userID = request.form['userID']
+            #保险机制，确保加入订单
+            if userID==openid:
+                if order.numExist >= order.numNeed:
+                    return jsonify({
+                        "msg":"order is full"
+                    }),403
+                
+                if order.postID== str(openid):
+                    return jsonify({
+                        "msg":"you are the poster"
+                    }),403
+
+                if order.postID!= str(openid):
+                    order.numExist+=1
+                    p=Pick2order(kind=2,userID=openid,orderID=orderID)
+                    db.session.add(p,order)
+                    db.session.commit()
+                    way = {
+                        'tel':order.tel,
+                        "wechat":order.wechat,
+                        "qq":order.qq
+                    }
+                    return jsonify({
+                        'way':way
+                    }),200
+
+    # if request.method=="GET":
+    #     #获取订单信息
+    #     order = Ordercar.query.filter_by(id=orderID).first()
+    #     info={
+    #     'datetime' : order.datetime,
+    #     'placeA' : order.placeA,
+    #     'placeB' : order.placeB,
+    #     'timeGo' : order.time,
+    #     'picture' : order.picture,
+    #     'heading' : order.heading,
+    #     'content' : order.content,
+    #     'numNeed': order.numNeed,
+    #     'numExist' : order.numExist
+    #     }
+    #     p2order=Pick2order.query.filter_by(kind=2, orderID=orderID).all()
+    #     userPicture=[]
+    #     postUser = User.query.filter_by(openid=order.postID).first()
+    #     userPicture.append(postUser.headPicture)
+    #     for u in u2order:
+    #         us=User.query.filter_by(openid=u.user_id).first()
+    #         userPicture.append(us.headpicture)
+    #     userspicture={
+    #         'userpictures': userPicture
+    #     }
+    #     commentss=Comment.query.filter_by(ordercarID=orderID).all()
+    #     comments=[]
+    #     for c in commentss:
+    #         us = User.query.filter_by(openid=c.userID)
+    #         x={
+    #             'datetime':c.datetime,
+    #             'content':c.content,
+    #             'headpicture':us.headpicture,
+    #             'username':us.username
+    #         }
+    #         comments.append(x)
+
+    #     data=[info,userPicture,comments]
+    #     return jsonify({
+    #         'data':data
+    #     }),200
+
+
+
+@api.route('/order/buy/list/',methods=['GET'])
+def order_list():
+    kind = request.args.get('kind',1,type=int)
+    page = request.args.get('page',1,type=int)
+    pagination=Orderbuy.query.filter_by(kind=kind).paginate(page,per_page=10,error_out=False)
+    orderlist=[]
+    for item in pagination.items:
+        order={
+            'orderbuyID': item.id,
+            'heading': item.heading,
+            'timeBuy': item.timeBuy,
+            'location': item.location,
+            'numExist': item.numExist,
+            'numNeed' : item.numNeed,
+            'content' : item.content
+        }
+        orderlist.append(order)
+    data={
+        'pageNum': pagination.page,
+        'pageMax': pagination.pages,
+        'hasNexe': pagination.has_next,
+        'ordersnum':pagination.total,
+        'orderList':orderlist
+    }
+
+    return  jsonify({
+        'data':data
+    }),200
+
+
+
+@api.route('/order/car/list/',methods=['GET'],endpoint='order_list1')
+def order_list():
+    page=request.args.get('page',1,type=int)
+    pagination=Ordercar.query.paginate(page,per_page=10,error_out=False)
+    orderlist=[]
+    for item in pagination.items:
+        order={
+        'ordercarID': item.id,
+        'heading': item.heading,
+        'timeGo': item.timeGo,
+        'placeA': item.placeA,
+        'placeB': item.placeB,
+        'numExist': item.numExist,
+        'numNeed' : item.numNeed
+        }
+        orderlist.append(order)
+    data={
+        'pageNum': pagination.page,
+        'pageMax': pagination.pages,
+        'hasNexe': pagination.has_next,
+        'ordersnum':pagination.total,
+        'orderList':orderlist
+    }
+
+    return  jsonify({
+        'data':data
+    }),200
+
+#添加评论
+@api.route('/order/comments/buy/',methods=['POST'],endpoint="commentBuy")
+@User.check
+def comment(openid):
+    orderID=request.args.get("orderID",-1,type=int)
+    if orderID==-1:
+        return jsonify({
+            "msg":"加上orderID参数"
+        }),402
+    #print("I am here!!!!!!!!!!!!!!!")
+    userID=request.json.get('userID')
+    content=request.json.get('content')
+    if userID==openid:
+        comment=Comment(userID=userID,kind=1,orderbuyID=orderID,content=content)
+        db.session.add(comment)
+        db.session.commit()
+        commentID=comment.id
+        return jsonify({
+            'commentID':commentID
+        }),200
+    else:
+        return jsonify({
+            "msg":"openid与userID不同"
+        })，401
+
+# @api.route('/order/comments/car/',methods=['POST'],endpoint='commentCar')
+# @User.check
+# def comment(openid,orderID):
+#     orderID=request.args.get("orderID",-1,type=int)
+#     if orderID==-1:
+#         return jsonify({
+#             "msg":"加上orderID参数"
+#         }),402
+#     #print("I am here!!!!!!!!!!!!!!!")
+#     userID=request.json.get('userID')
+#     content=request.json.get('content')
+#     #确保准确post
+#     if userID==openid:
+#         comment=Comment(userID=userID,kind=2,ordercarID=orderID,content=content)
+#         db.session.add(comment)
+#         db.session.commit()
+#         commentID=comment.id
+#         return jsonify({
+#             'commentID':commentID
+#         }),200
+#     else:
+#         return jsonify({
+#             "msg":"openid与userID不同"
+#         })，401
+
+#发起的订单
+@api.route('/order/post/list/',methods=['GET'],endpoint='order_list_post')
+@User.check
+def order_list(openid):
+    page=request.args.get('page',1,type=int)
+    pagination=P2order.query.filter_by(userID=openid).paginate(page,per_page=10,error_out=False)
+    items=pagination.items
+    orderlist=[]
+    for item in items:
+        kind=item.kind
+        if kind==1:
+            orderID = item.orderID
+            order=Orderbuy.query.filter_by(id=orderID).first()
+            info={
+                "kind":1,
+                'orderbuyID': order.id,
+                'heading': order.heading,
+                'timeBuy': order.time,
+                'location': order.location,
+                'numExist': order.numExist,
+                'numNeed' : order.numNeed,
+                'content' : order.content
+            }
+            orderlist.append(info)
+        elif kind==2:
+            orderID = item.orderID
+            order=Ordercar.query.filter_by(id=orderID).first()
+            info = {
+                "kind":2,
+                'ordercarID': item.id,
+                'heading': item.heading,
+                'timeGo': item.time,
+                'placeA': item.placeA,
+                'placeB': item.placeB,
+                'numExist': item.numExist,
+                'numNeed' : item.numNeed
+                }
+            orderlist.append(info)
+    data={
+        'pageNum': pagination.page,
+        'pageMax': pagination.pages,
+        'hasNext': pagination.has_next,
+        'ordersnum':pagination.total,
+        'orderList':orderlist
+    }
+    return jsonify({
+        'data':data
+    }),200
+
+#加入的订单
+@api.route('/order/pick/list/',methods=['GET'],endpoint='order_list_pick')
+@User.check
+def order_list(openid):
+    page=request.args.get('page',1,type=int)
+    pagination=U2order.query.filter_by(userID=openid).paginate(page,per_page=10,error_out=False)
+    items=pagination.items
+    orderlist=[]
+    for item in items:
+        kind=item.kind
+        if kind==1:
+            orderID = item.orderID
+            order=Orderbuy.query.filter_by(id=orderID).first()
+            info={
+                "kind":1,
+                'orderbuyID': order.id,
+                'heading': order.heading,
+                'timeBuy': order.time,
+                'location': order.location,
+                'numExist': order.numExist,
+                'numNeed' : order.numNeed,
+                'content' : order.content
+            }
+            orderlist.append(info)
+        elif kind==2:
+            orderID = item.orderID
+            order=Ordercar.query.filter_by(id=orderID).first()
+            info = {
+                "kind":2,
+                'ordercarID': item.id,
+                'heading': item.heading,
+                'timeGo': item.time,
+                'placeA': item.placeA,
+                'placeB': item.placeB,
+                'numExist': item.numExist,
+                'numNeed' : item.numNeed
+                }
+            orderlist.append(info)
+    data={
+        'pageNum': pagination.page,
+        'pageMax': pagination.pages,
+        'hasNext': pagination.has_next,
+        'ordersnum':pagination.total,
+        'orderList':orderlist
+    }
+    return jsonify({
+        'data':data
+    }),200
+
+#评论过的订单
+@api.route('order/comment/list/',methods=['GET'],endpoint='order_list_comment')
+@User.check
+def order_list(openid):
+    page=request.args.get('page',1,type=int)
+    pagination=Comment.query.filter_by(userID=openid).paginate(page,per_page=10,error_out=False)
+    items=pagination.items
+    orderlist=[]
+    for item in items:
+        kind=item.kind
+        if kind==1:
+            orderID = item.orderbuyID
+            order=Orderbuy.query.filter_by(id=orderID).first()
+            info={
+                "kind":1,
+                'orderbuyID': order.id,
+                'heading': order.heading,
+                'timeBuy': order.time,
+                'location': order.location,
+                'numExist': order.numExist,
+                'numNeed' : order.numNeed,
+                'content' : order.content
+            }
+            orderlist.append(info)
+        elif kind==2:
+            orderID = item.ordercarID
+            order=Ordercar.query.filter_by(id=orderID).first()
+            info = {
+                "kind":2,
+                'ordercarID': item.id,
+                'heading': item.heading,
+                'timeGo': item.time,
+                'placeA': item.placeA,
+                'placeB': item.placeB,
+                'numExist': item.numExist,
+                'numNeed' : item.numNeed
+                }
+            orderlist.append(info)
+    data={
+        'pageNum': pagination.page,
+        'pageMax': pagination.pages,
+        'hasNext': pagination.has_next,
+        'ordersnum':pagination.total,
+        'orderList':orderlist
+    }
+    return jsonify({
+        'data':data
+    }),200
+
