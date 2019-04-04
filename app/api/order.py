@@ -14,7 +14,7 @@ from ..login import get_id
 from ..models import Comment, Orderbuy, Ordercar, User,Post2order,Pick2order
 
 #添加订单,获取订单，加入订单。
-@api.route('/order/buy/',methods=['POST'，'GET'])
+@api.route('/order/buy/',methods=['POST','GET'],endpoint="add_order_buy")
 @User.check
 def add_order(openid):
     orderID = request.args.get("orderID",-1,type=int)
@@ -50,7 +50,7 @@ def add_order(openid):
         else:
             #加入订单
             order = Orderbuy.query.filter_by(id=orderID).first()
-            userID = request.form['userID']
+            userID = request.json['userID']
             #保险机制，确保加入订单
             if userID==openid:
                 if order.numExist >= order.numNeed:
@@ -94,8 +94,8 @@ def add_order(openid):
         userPicture=[]
         postUser = User.query.filter_by(openid=order.postID).first()
         userPicture.append(postUser.headPicture)
-        for u in u2order:
-            us=User.query.filter_by(openid=u.user_id).first()
+        for u in p2order:
+            us=User.query.filter_by(openid=u.userID).first()
             userPicture.append(us.headpicture)
         userspicture={
             'userpictures': userPicture
@@ -120,7 +120,7 @@ def add_order(openid):
 
 
 #添加订单,获取订单，加入订单。
-@api.route('/order/car/',methods=['POST'])
+@api.route('/order/car/',methods=['POST'],endpoint="add_order_car")
 @User.check
 def add_order(openid):
     orderID = request.args.get("orderID",-1,type=int)
@@ -155,7 +155,7 @@ def add_order(openid):
         else:
             #加入订单
             order = Ordercar.query.filter_by(id=orderID).first()
-            userID = request.form['userID']
+            userID = request.json['userID']
             #保险机制，确保加入订单
             if userID==openid:
                 if order.numExist >= order.numNeed:
@@ -182,46 +182,7 @@ def add_order(openid):
                         'way':way
                     }),200
 
-    # if request.method=="GET":
-    #     #获取订单信息
-    #     order = Ordercar.query.filter_by(id=orderID).first()
-    #     info={
-    #     'datetime' : order.datetime,
-    #     'placeA' : order.placeA,
-    #     'placeB' : order.placeB,
-    #     'timeGo' : order.time,
-    #     'picture' : order.picture,
-    #     'heading' : order.heading,
-    #     'content' : order.content,
-    #     'numNeed': order.numNeed,
-    #     'numExist' : order.numExist
-    #     }
-    #     p2order=Pick2order.query.filter_by(kind=2, orderID=orderID).all()
-    #     userPicture=[]
-    #     postUser = User.query.filter_by(openid=order.postID).first()
-    #     userPicture.append(postUser.headPicture)
-    #     for u in u2order:
-    #         us=User.query.filter_by(openid=u.user_id).first()
-    #         userPicture.append(us.headpicture)
-    #     userspicture={
-    #         'userpictures': userPicture
-    #     }
-    #     commentss=Comment.query.filter_by(ordercarID=orderID).all()
-    #     comments=[]
-    #     for c in commentss:
-    #         us = User.query.filter_by(openid=c.userID)
-    #         x={
-    #             'datetime':c.datetime,
-    #             'content':c.content,
-    #             'headpicture':us.headpicture,
-    #             'username':us.username
-    #         }
-    #         comments.append(x)
-
-    #     data=[info,userPicture,comments]
-    #     return jsonify({
-    #         'data':data
-    #     }),200
+   
 
 
 
@@ -307,32 +268,9 @@ def comment(openid):
     else:
         return jsonify({
             "msg":"openid与userID不同"
-        })，401
+        }),401
 
-# @api.route('/order/comments/car/',methods=['POST'],endpoint='commentCar')
-# @User.check
-# def comment(openid,orderID):
-#     orderID=request.args.get("orderID",-1,type=int)
-#     if orderID==-1:
-#         return jsonify({
-#             "msg":"加上orderID参数"
-#         }),402
-#     #print("I am here!!!!!!!!!!!!!!!")
-#     userID=request.json.get('userID')
-#     content=request.json.get('content')
-#     #确保准确post
-#     if userID==openid:
-#         comment=Comment(userID=userID,kind=2,ordercarID=orderID,content=content)
-#         db.session.add(comment)
-#         db.session.commit()
-#         commentID=comment.id
-#         return jsonify({
-#             'commentID':commentID
-#         }),200
-#     else:
-#         return jsonify({
-#             "msg":"openid与userID不同"
-#         })，401
+
 
 #发起的订单
 @api.route('/order/post/list/',methods=['GET'],endpoint='order_list_post')
@@ -481,3 +419,69 @@ def order_list(openid):
         'data':data
     }),200
 
+
+ # if request.method=="GET":
+    #     #获取订单信息
+    #     order = Ordercar.query.filter_by(id=orderID).first()
+    #     info={
+    #     'datetime' : order.datetime,
+    #     'placeA' : order.placeA,
+    #     'placeB' : order.placeB,
+    #     'timeGo' : order.time,
+    #     'picture' : order.picture,
+    #     'heading' : order.heading,
+    #     'content' : order.content,
+    #     'numNeed': order.numNeed,
+    #     'numExist' : order.numExist
+    #     }
+    #     p2order=Pick2order.query.filter_by(kind=2, orderID=orderID).all()
+    #     userPicture=[]
+    #     postUser = User.query.filter_by(openid=order.postID).first()
+    #     userPicture.append(postUser.headPicture)
+    #     for u in u2order:
+    #         us=User.query.filter_by(openid=u.userID).first()
+    #         userPicture.append(us.headpicture)
+    #     userspicture={
+    #         'userpictures': userPicture
+    #     }
+    #     commentss=Comment.query.filter_by(ordercarID=orderID).all()
+    #     comments=[]
+    #     for c in commentss:
+    #         us = User.query.filter_by(openid=c.userID)
+    #         x={
+    #             'datetime':c.datetime,
+    #             'content':c.content,
+    #             'headpicture':us.headpicture,
+    #             'username':us.username
+    #         }
+    #         comments.append(x)
+
+    #     data=[info,userPicture,comments]
+    #     return jsonify({
+    #         'data':data
+    #     }),200
+
+#@api.route('/order/comments/car/',methods=['POST'],endpoint='commentCar')
+# @User.check
+# def comment(openid,orderID):
+#     orderID=request.args.get("orderID",-1,type=int)
+#     if orderID==-1:
+#         return jsonify({
+#             "msg":"加上orderID参数"
+#         }),402
+#     #print("I am here!!!!!!!!!!!!!!!")
+#     userID=request.json.get('userID')
+#     content=request.json.get('content')
+#     #确保准确post
+#     if userID==openid:
+#         comment=Comment(userID=userID,kind=2,ordercarID=orderID,content=content)
+#         db.session.add(comment)
+#         db.session.commit()
+#         commentID=comment.id
+#         return jsonify({
+#             'commentID':commentID
+#         }),200
+#     else:
+#         return jsonify({
+#             "msg":"openid与userID不同"
+#         })，401

@@ -14,7 +14,7 @@ from qiniu import Auth, put_file, etag, urlsafe_base64_encode
 from . import api
 from .. import db
 from ..login import get_id
-from ..models import Comment, Orderbuy, Ordercar, User,U2order,P2order
+from ..models import Comment, Orderbuy, Ordercar, User,Pick2order,Post2order
 
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])

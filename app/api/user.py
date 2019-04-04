@@ -21,9 +21,9 @@ def user_info(openid):
     if request.method == 'GET':
         info={
             "username":us.username,
-            "headpicture":us.headpicture,
+            "headPicture":us.headPicture,
             "openid":us.openid,
-            "st_num": us.st_num,
+            "stNum": us.stNum,
             "wechat" : us.wechat,
             "tel":us.tel,
             "qq":us.qq
@@ -57,9 +57,9 @@ def user_info(openid):
 #         })
 #     info={
 #         "username":us.username,
-#         "headpicture":us.headpicture,
+#         "headPictur":us.headPictur,
 #         "openid":us.openid,
-#         "st_num": us.st_num,
+#         "stNum": us.stNum,
 #         "wechat" : us.wechat,
 #         "tel":us.tel,
 #         "qq":us.qq

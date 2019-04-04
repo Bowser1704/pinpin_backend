@@ -65,13 +65,13 @@ class Order(db.Model):
     postID = db.Column(db.String(30))
     #------- 
 
-class Orderbuy(db.Model,Order):
+class Orderbuy(Order):
     kind = db.Column(db.Integer)
     location = db.Column(db.String(60))
     picture = db.Column(db.String(120))
     
 
-class Ordercar(db.Model,Order):
+class Ordercar(Order):
     placeA = db.Column(db.String(50),index=True)
     placeB = db.Column(db.String(50),index=True)
     
