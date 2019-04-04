@@ -14,9 +14,9 @@ from ..login import get_id
 from ..models import Comment, Orderbuy, Ordercar, User,Post2order,Pick2order
 
 #添加订单,获取订单，加入订单。
-@api.route('/order/buy/',methods=['POST','GET'],endpoint="add_order_buy")
+@api.route('/order/buy/',methods=['POST','GET'],endpoint="order_buy")
 @User.check
-def add_order(openid):
+def order(openid):
     orderID = request.args.get("orderID",-1,type=int)
     if request.method=='POST':    
         if orderID==-1:
@@ -40,8 +40,8 @@ def add_order(openid):
             db.session.add(order)
             db.session.commit()
             orderID=order.id
-            p2order = Post2order(kind=1,userID=openid,orderID=orderID)
-            db.session.add(p2order)
+            P2order = Post2order(kind=1,userID=openid,orderID=orderID)
+            db.session.add(P2order)
             db.session.commit()
             return jsonify({
                 'orderID':orderID
@@ -90,11 +90,11 @@ def add_order(openid):
         'numNeed': order.numNeed,
         'numExist' : order.numExist
         }
-        p2order=Pick2order.query.filter_by(kind=1, orderID=orderID).all()
+        P2order=Pick2order.query.filter_by(kind=1, orderID=orderID).all()
         userPicture=[]
         postUser = User.query.filter_by(openid=order.postID).first()
         userPicture.append(postUser.headPicture)
-        for u in p2order:
+        for u in P2order:
             us=User.query.filter_by(openid=u.userID).first()
             userPicture.append(us.headpicture)
         userspicture={
@@ -120,9 +120,9 @@ def add_order(openid):
 
 
 #添加订单,获取订单，加入订单。
-@api.route('/order/car/',methods=['POST'],endpoint="add_order_car")
+@api.route('/order/car/',methods=['POST'],endpoint="order_car")
 @User.check
-def add_order(openid):
+def order(openid):
     orderID = request.args.get("orderID",-1,type=int)
     if request.method=='POST':    
         if orderID==-1:
@@ -145,8 +145,8 @@ def add_order(openid):
             db.session.add(order)
             db.session.commit()
             orderID=order.id
-            p2order = Post2order(kind=2,userID=openid,orderID=orderID)
-            db.session.add(p2order)
+            P2order = Post2order(kind=2,userID=openid,orderID=orderID)
+            db.session.add(P2order)
             db.session.commit()
             return jsonify({
                 'orderID':orderID
@@ -258,7 +258,7 @@ def comment(openid):
     userID=request.json.get('userID')
     content=request.json.get('content')
     if userID==openid:
-        comment=Comment(userID=userID,kind=1,orderbuyID=orderID,content=content)
+        comment=Comment(userID=userID,orderbuyID=orderID,content=content)
         db.session.add(comment)
         db.session.commit()
         commentID=comment.id
@@ -277,7 +277,7 @@ def comment(openid):
 @User.check
 def order_list(openid):
     page=request.args.get('page',1,type=int)
-    pagination=P2order.query.filter_by(userID=openid).paginate(page,per_page=10,error_out=False)
+    pagination=Post2order.query.filter_by(userID=openid).paginate(page,per_page=10,error_out=False)
     items=pagination.items
     orderlist=[]
     for item in items:
@@ -326,7 +326,7 @@ def order_list(openid):
 @User.check
 def order_list(openid):
     page=request.args.get('page',1,type=int)
-    pagination=U2order.query.filter_by(userID=openid).paginate(page,per_page=10,error_out=False)
+    pagination=Pick2order.query.filter_by(userID=openid).paginate(page,per_page=10,error_out=False)
     items=pagination.items
     orderlist=[]
     for item in items:
@@ -434,11 +434,11 @@ def order_list(openid):
     #     'numNeed': order.numNeed,
     #     'numExist' : order.numExist
     #     }
-    #     p2order=Pick2order.query.filter_by(kind=2, orderID=orderID).all()
+    #     Post2order=Pick2order.query.filter_by(kind=2, orderID=orderID).all()
     #     userPicture=[]
     #     postUser = User.query.filter_by(openid=order.postID).first()
     #     userPicture.append(postUser.headPicture)
-    #     for u in u2order:
+    #     for u in Pick2order:
     #         us=User.query.filter_by(openid=u.userID).first()
     #         userPicture.append(us.headpicture)
     #     userspicture={

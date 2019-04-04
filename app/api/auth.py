@@ -11,10 +11,11 @@ from ..models import User
 
 @api.route('auth/login/',methods=[ 'POST'])
 def login():
-    username=request.json['username']
+    
     stNum=request.json['stNum']
     password=request.json['password']
-    headPicture=request.json['headPicture']
+    # username=request.json['username']
+    # headPicture=request.json['headPicture']
     is_st = try_login(username=stNum,password=password)
     if stNum=="2018212576":
         is_st = True
@@ -27,8 +28,6 @@ def login():
         if us is None :
             us=User(openid=openid)
         us.stNum=stNum
-        us.headPicture=headPicture
-        us.username=username
         db.session.add(us)
         db.session.commit()
         token=us.generate_token()
@@ -43,8 +42,8 @@ def login():
 @api.route('auth/openid/',methods=['POST'])   
 def get_openid():
     code=request.json['code']
-    headPicture=request.json['headPicture']
-    username = request.json['username']
+    # headPicture=request.json['headPicture']
+    # username = request.json['username']
     url="https://api.weixin.qq.com/sns/jscode2session?appid=wx383b3e632cb77531&secret=1d687ad62829c2211567435a39f944c4&js_code="+ code + "&grant_type=authorization_code"
     try:
         x=requests.get(url)
@@ -63,12 +62,6 @@ def get_openid():
                 "openid":openid
             }),200
         else:
-            if headPicture!=us.headPicture:
-                us.headPicture=headPicture
-            if username != us.username:
-                us.username = username
-            db.session.add(us)
-            db.session.commit()
             token=us.generate_token()
             return jsonify({
                 "msg": "已经学号认证",
@@ -78,4 +71,4 @@ def get_openid():
     else:
         return jsonify({
             "msg":"wrong"
-        }),500
+        }),402

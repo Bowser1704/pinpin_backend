@@ -34,6 +34,8 @@ def user_info(openid):
     elif request.method =='PUT':
         #data=request.get_json()
         if request.is_json:
+            us.username = request.json['username']
+            us.headPicture = request.json['headPicture']
             us.tel=request.json['tel']
             us.wechat=request.json['wechat']
             us.qq=request.json['qq']
