@@ -1,0 +1,797 @@
+swagger: "2.0"
+
+info:
+  version: 0.0.2
+  title:  ccnupp API
+  description: the edtion API for AA ccnupp
+  
+schemes: 
+  - https
+host: www.pinpin.muxixyz.com
+basePath: /api/v1
+
+tags:
+- name: "auth"
+  description: 验证权限
+- name: "user"
+  description: 用户信息
+- name: "order"
+  description: 订单信息
+
+  
+securityDefinitions:
+  token:
+    type: apiKey
+    description: token
+    name: token
+    in: header
+
+paths:
+  /auth/openid/:
+    post:
+      tags:
+      - "auth"
+      summary: 获取openid
+      description: 访问获取openid
+      consumes: 
+        - application/json
+      produces: 
+        - application/json
+      parameters:
+        - in: body
+          name: postData
+          schema: 
+            - code
+          properties:
+            code:
+              type: string
+      responses: 
+        200:
+          description: OK
+          schema:
+            required: 
+              - openid
+            properties: 
+              openid:
+                type: string
+        201:
+          description: OK,他已经绑定了学号不用登陆了。
+          schema:
+            required: 
+              - openid
+              - token
+            properties:
+              openid:
+                type: string
+              token:
+                type: string
+        401:
+          description: code输错了
+
+  /auth/login/:
+    post:
+      tags:
+      - "auth"
+      summary: 学号认证
+      description: 没有绑定学号，统一身份认证服务系统信息认证 one.ccnu.edu.cn
+      consumes: 
+        - application/json
+      produces: 
+        - application/json
+      parameters:
+        - in: header
+          name: openid
+          type: string
+          
+        - name: Postdata
+          in: body
+          description: 密码
+          schema:
+            required:
+              - stNum
+              - password
+            properties:
+              stNum:
+                type: string
+              password:
+                type: string
+      
+      responses:
+        200:
+          description: OK
+          schema: 
+            required: 
+              - token
+            properties:
+              token:
+                type: string 
+        401:
+          description: password is wrong
+        402:
+          description: login error
+        500: 
+          description: server wrong
+
+  /user/info/:
+    put:
+      tags:
+      - "user"
+      summary: 更新用户的信息
+      description: 更新联系方式
+      consumes: 
+        - application/json
+      produces: 
+        - application/json
+      parameters:
+        - name: Postdata
+          in: body
+          description: qq+wechat+tel 没填就传个空值吧
+          schema:
+            required: 
+              - tel
+              - qq
+              - wechat
+              - username
+              - headPicture
+            properties:
+              tel:
+                type: string
+              qq:
+                type: string
+              wechat:
+                type: string   
+              username:
+                type: string
+              headPicture:
+                type: string
+                
+      responses:
+        200:
+          description: OK,update sucessfully
+        400: 
+          description: ...
+        401: 
+          description: server wrong
+      
+    get:
+      tags:
+      - "user"
+      summary: 获取用户信息
+      description: 获取联系方式等
+
+      responses:
+        200:
+          description: OK
+          schema:
+            required:
+              - qq
+              - tel
+              - wechat
+              - openid
+              - st_num
+            properties:
+              qq:
+                type: string
+              tel:
+                type: string
+              wechat:
+                type: string
+              openid:
+                type: integer
+              st_num:
+                type: string
+          
+  /order/post/buy/:
+    post:
+      tags:
+        - "order"
+      summary: 添加一个购物拼单
+      
+      consumes: 
+        - application/json
+      produces: 
+        - application/json
+      parameters:
+        - name: Postdata
+          in: body
+          schema:
+            required:
+              - kind
+              - location
+              - timeBuy
+              - numNeed
+              - picture
+              - heading
+              - content
+              - tel
+              - wecaht
+              - qq
+            properties:
+              kind:
+                type: integer
+              location:
+                type: string
+              timeBuy: 
+                type: string
+              numNeed:
+                type: integer
+              heading:
+                type: string
+              content:
+                type: string
+              tel:
+                type: string
+              qq:
+                type: string
+              wechat:
+                type: string
+              picture:
+                type: string
+              
+      responses:
+        200: 
+            description: OK
+            schema:
+              required:
+                - orderbuyID
+              properties:
+                orderbuyID:
+                  type: string
+
+  /order/buy/:
+    get:
+      tags:
+        - "order"
+      summary: 通过id返回订信息
+      parameters:
+        - in: path
+          name: orderID
+          required: true
+          type: integer
+      responses:
+        200:
+          description: OK
+          schema:
+            required:
+              - datetime
+              - kind
+              - location
+              - timeBuy
+              - numExist
+              - numNeed 
+              - picture
+              - heading
+              - content
+              - usersPicture
+              - comments
+            properties:
+              datetime:
+                type: string
+              kind:
+                type: integer
+              location: 
+                type: string
+              timeBuy:
+                type: string
+              numNeed:
+                type: integer
+              numExist:
+                type: integer
+              picture:
+                type: string
+              content:
+                type: string
+              heading:
+                type: string
+              full:
+                type: boolean
+              userPicture:
+                type: array
+                items:
+                  required:
+                    - userpicture
+                properties:
+                  userpicture:
+                    type: string
+              comments:
+                type: array
+                items:
+                  required:
+                    - username
+                    - headpicture
+                    - content
+                    - datatime
+                  properties:
+                    username:
+                      type: string
+                    headpicture:
+                      type: string
+                    content:
+                      type: string
+                    datatime:
+                      type: string
+    post:
+      tags:
+        - "order"
+      summary: 加入这个拼单
+      parameters:
+        - in: path 
+          name: orderID
+          required: true
+          type: integer
+        - in: body
+          name: postdata
+          schema:
+            required:
+              - userID
+            properties:
+              usersId:
+                type: string
+      
+      responses:
+        200:
+          description: attend sucessfully
+          schema:
+            required:
+              - tel
+              - qq
+              - wechat
+            properties:
+              tel:
+                type: string
+              qq:
+                type: string
+              wecaht:
+                type: string
+        401:
+          description: authenticate fail
+
+  /order/post/car/:
+    post:
+      tags:
+        - "order"
+      summary: 添加一个车拼单
+      parameters:
+        - in: body
+          name: postdata
+          schema:
+            required:
+              - placeA
+              - placeB
+              - numNeed
+              - timeGo 
+              - content
+            properties:
+              placeA:
+                type: string
+              placeB:
+                type: string
+              timeGo:
+                type: string
+              content:
+                type: string
+              numNeed:
+                type: string
+              tel:
+                type: string
+              qq:
+                type: string
+              wechat:
+                type: string
+      responses:
+        200: 
+          description: OK
+          schema:
+            required:
+              - ordercarID
+            properties:
+              ordercarID:
+                type: integer
+        401:
+          description: authenticate fail
+
+  /order/car/:
+    post:
+      tags:
+        - "order"
+      summary: 加入这个订单
+      parameters:
+        - in: path 
+          name: ordercarID
+          required: true
+          type: integer
+        - in: body
+          name: postdata
+          schema:
+            required:
+              - usersId
+            properties:
+              usersId:
+                type: integer
+      responses:
+        200:
+          description: attend sucessfully
+        401:
+          description: authenticate fail
+
+
+
+
+  /order/buy/list/:
+    get:
+      tags:
+        - "order"
+      summary: 分页分类获取拼购订单
+      description: 获取拼购订单按照不同的分类
+      parameters:
+        - in: path 
+          name: kind
+          description: 分别各类 1-网购 2-外卖 3-会员账号 4-其他
+          required: true
+          type: integer
+        - in: path 
+          name: page
+          description: 对订单分页获取 每页10个 默认为1
+          required: true
+          type: integer
+      responses:
+        200:
+          description: OK
+          schema: 
+            required:
+              - pageNum
+              - pageMax
+              - hasNext
+              - ordersnum
+              - orderList
+            properties:
+              pageNum:
+                type: integer
+              pageMax:
+                type: integer
+              hasNext:
+                type: boolean
+              ordersnum:
+                type: integer
+              orderList:
+                type: array
+                items:
+                  required:
+                    - orderbuyID
+                    - heading
+                    - timeBuy
+                    - location
+                    - numExist
+                    - numNeed
+                    - content
+                  properties:
+                    orderbuyID:
+                      type: integer
+                    heading:
+                      type: string
+                    timeBuy:
+                      type: string
+                    location:
+                      type: string
+                    numExist:
+                      type: integer
+                    numNeed:
+                      type: integer
+                    content:
+                      type: string
+        201:
+          description: none order
+
+
+  /order/car/list/:
+    get:
+      tags:
+        - "order"
+      summary: 分页获取拼车订单
+      parameters:
+        - in: path 
+          name: page 
+          description: page default=1
+          required: true
+          type: integer
+      responses:
+        200:
+          description: OK
+          schema:
+            required:
+              - pageNum
+              - pageMax
+              - hasNext
+              - ordersnum
+              - orderList
+            properties:
+              pageNum:
+                type: integer
+              pageMax:
+                type: integer
+              hasNext:
+                type: boolean
+              ordersnum:
+                type: integer
+              orderList:
+                type: array
+                items:
+                  required:
+                    - ordercarID
+                    - heading
+                    - timeGo
+                    - placeA
+                    - placeB
+                    - numExist
+                    - numNeed
+                  properties:
+                    orderbuyID:
+                      type: integer
+                    heading:
+                      type: string
+                    timeGo:
+                      type: string
+                    placeA:
+                      type: string
+                    placeB:
+                      type: string
+                    numExist:
+                      type: integer
+                    numNeed:
+                      type: integer
+        201:
+          description: none order
+      
+  /order/post/list/:
+    get:
+      tags:
+        - "order"
+      summary: 获取某用户发起的订单
+      responses:
+        200:
+          description: OK
+          schema:
+            required:
+              - pageNum
+              - pageMax
+              - hasNext
+              - ordersnum
+              - orderList
+            properties:
+              pageNum:
+                type: integer
+              pageMax:
+                type: integer
+              hasNext:
+                type: boolean
+              ordersnum:
+                type: integer
+              orderList:
+                type: array
+                items:
+                  required:
+                    - orderbuyID
+                    - heading
+                    - timeBuy
+                    - location
+                    - full
+                    - numExist
+                    - numNeed
+                    - content
+                  properties:
+                    orderbuyID:
+                      type: integer
+                    heading:
+                      type: string
+                    timeBuy:
+                      type: string
+                    location:
+                      type: string
+                    full:
+                      type: boolean
+                    numExist:
+                      type: integer
+                    numNeed:
+                      type: integer
+                    content:
+                      type: string
+        201:
+          description: none order
+  
+
+          
+  /order/pick/list/:
+     get:
+      tags:
+        - "order"
+      summary: 获取某用户的拼车订单
+      parameters:
+        - in: path 
+          name: userID
+          description: userID即为用户的openID
+          required: true
+          type: string
+        - in: path 
+          name: page 
+          required: true
+          type: integer
+      responses:
+        200:
+          description: OK
+          schema:
+            required:
+              - pageNum
+              - pageMax
+              - hasNext
+              - ordersnum
+              - orderList
+            properties:
+              pageNum:
+                type: integer
+              pageMax:
+                type: integer
+              hasNext:
+                type: boolean
+              ordersnum:
+                type: integer
+              orderList:
+                type: array
+                items:
+                  required:
+                    - kind
+                    - orderID
+                    - heading
+                    - timeGo
+                    - placeA
+                    - placeB
+                    - full
+                    - numExist
+                    - numNeed
+                  properties:
+                    kind:
+                      type: string
+                    ordercarID:
+                      type: integer
+                    heading:
+                      type: string
+                    timeGo:
+                      type: string
+                    placeA:
+                      type: string
+                    placeB:
+                      type: string
+                    full:
+                      type: boolean
+                    numExist:
+                      type: integer
+                    numNeed:
+                      type: integer
+        201:
+          description: none list 
+          
+  /order/comment/list/:
+     get:
+      tags:
+        - "order"
+      summary: 获取某用户的拼车订单
+      parameters:
+        - in: path 
+          name: userID
+          description: userID即为用户的openID
+          required: true
+          type: string
+        - in: path 
+          name: page 
+          required: true
+          type: integer
+      responses:
+        200:
+          description: OK
+          schema:
+            required:
+              - pageNum
+              - pageMax
+              - hasNext
+              - ordersnum
+              - orderList
+            properties:
+              pageNum:
+                type: integer
+              pageMax:
+                type: integer
+              hasNext:
+                type: boolean
+              ordersnum:
+                type: integer
+              orderList:
+                type: array
+                items:
+                  required:
+                    - kind
+                    - orderID
+                    - heading
+                    - timeGo
+                    - placeA
+                    - placeB
+                    - full
+                    - numExist
+                    - numNeed
+                  properties:
+                    kind:
+                      type: string
+                    ordercarID:
+                      type: integer
+                    heading:
+                      type: string
+                    timeGo:
+                      type: string
+                    placeA:
+                      type: string
+                    placeB:
+                      type: string
+                    full:
+                      type: boolean
+                    numExist:
+                      type: integer
+                    numNeed:
+                      type: integer
+        201:
+          description: none list 
+      
+
+  /order/comments/buy/:
+    post:
+      tags:
+        - "order"
+      summary: 添加评论
+      description: orderID即为订单id
+      parameters:
+        - in: path 
+          name: orderID
+          required: true
+          type: integer
+        - in: body
+          name: postdata
+          schema:
+            required: 
+              - userID
+              - content
+            properties:
+              userID:
+                type: string
+              contnet:
+                type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            required:
+              - commentID
+            properties:
+              commentID:
+                type: integer
+                
+
+  /order/image/:
+    post:
+      tags:
+        - "order"
+      summary: "上传图片，一张张上传传好之后给你url，你在post_order时发给我"
+      description: "接受格式png，jpg，jpeg，gif，大小1m之内"
+      consumes: 
+        - multipart/form-data 
+      parameters: 
+        - in: formData
+          name: image
+          required: true
+          type: file
+      responses:
+        200:
+          description: OK
+          schema:
+            required:
+              - image_url
+            properties:
+              image_url:
+                type: string
+        

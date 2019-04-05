@@ -14,68 +14,77 @@ from ..login import get_id
 from ..models import Comment, Orderbuy, Ordercar, User,Post2order,Pick2order
 
 #添加订单,获取订单，加入订单。
+@api.route('/order/post/buy/',methods=['POST'],endpoint="add_order_buy")
+@User.check
+def order(openid):
+    if request.method=='POST':    
+        #添加订单
+        data=request.get_json()
+        order=Orderbuy(postID=openid,datetime=datetime.datetime.utcnow())
+        order.kind=data.get('kind')
+        order.location=data.get('location')
+        order.time=data.get('timeBuy')
+        order.numNeed=data.get('numNeed')
+        order.heading=data.get('heading')
+        order.content=data.get('content')
+        order.tel=data.get('tel')
+        order.qq=data.get('qq')
+        order.wecaht=data.get('wechat')
+        order.picture=data.get('picture')
+        #；隔开每一个picture_url
+        #内容非必填
+        #联系方式加入订单三个字段
+        order.numExist=1
+        db.session.add(order)
+        db.session.commit()
+        orderID=order.id
+        P2order = Post2order(kind=1,userID=openid,orderID=orderID)
+        db.session.add(P2order)
+        db.session.commit()
+        return jsonify({
+            'orderID':orderID
+        }),200
+        
 @api.route('/order/buy/',methods=['POST','GET'],endpoint="order_buy")
 @User.check
 def order(openid):
     orderID = request.args.get("orderID",-1,type=int)
-    if request.method=='POST':    
-        if orderID==-1:
-            #添加订单
-            data=request.get_json()
-            order=Orderbuy(postID=openid,datetime=datetime.datetime.utcnow())
-            order.kind=data.get('kind')
-            order.location=data.get('location')
-            order.time=data.get('timeBuy')
-            order.numNeed=data.get('numNeed')
-            order.heading=data.get('heading')
-            order.content=data.get('content')
-            order.tel=data.get('tel')
-            order.qq=data.get('qq')
-            order.wecaht=data.get('wechat')
-            order.picture=data.get('picture')
-            #；隔开每一个picture_url
-            #内容非必填
-            #联系方式加入订单三个字段
-            order.numExist=1
-            db.session.add(order)
-            db.session.commit()
-            orderID=order.id
-            P2order = Post2order(kind=1,userID=openid,orderID=orderID)
-            db.session.add(P2order)
-            db.session.commit()
-            return jsonify({
-                'orderID':orderID
-            }),200
-        
-        else:
-            #加入订单
-            order = Orderbuy.query.filter_by(id=orderID).first()
-            userID = request.json['userID']
-            #保险机制，确保加入订单
-            if userID==openid:
-                if order.numExist >= order.numNeed:
-                    return jsonify({
-                        "msg":"order is full"
-                    }),403
-                
-                if order.postID== str(openid):
-                    return jsonify({
-                        "msg":"you are the poster"
-                    }),403
+    if orderID==-1:
+        return jsonify({
+            "msg":"no orderID"
+        }),401
+    if request.method=='POST':
+        #加入订单
+        order = Orderbuy.query.filter_by(id=orderID).first()
+        userID = request.json['userID']
+        #保险机制，确保加入订单
+        if str(userID)==openid:
+            if order.numExist >= order.numNeed:
+                return jsonify({
+                    "msg":"order is full"
+                }),403
+            
+            if order.postID== str(openid):
+                return jsonify({
+                    "msg":"you are the poster"
+                }),403
 
-                if order.postID!= str(openid):
-                    order.numExist+=1
-                    p=Pick2order(kind=1,userID=openid,orderID=orderID)
-                    db.session.add(p,order)
-                    db.session.commit()
-                    way = {
-                        'tel':order.tel,
-                        "wechat":order.wechat,
-                        "qq":order.qq
-                    }
-                    return jsonify({
-                        'way':way
-                    }),200
+            if order.postID!= str(openid):
+                order.numExist+=1
+                p=Pick2order(kind=1,userID=openid,orderID=orderID)
+                db.session.add(p,order)
+                db.session.commit()
+                way = {
+                    'tel':order.tel,
+                    "wechat":order.wechat,
+                    "qq":order.qq
+                }
+                return jsonify({
+                    'way':way
+                }),200
+        return jsonify({
+            "msg":"不是原用户"
+        }),401
 
     if request.method=="GET":
         order = Orderbuy.query.filter_by(id=orderID).first()
@@ -90,16 +99,16 @@ def order(openid):
         'numNeed': order.numNeed,
         'numExist' : order.numExist
         }
-        P2order=Pick2order.query.filter_by(kind=1, orderID=orderID).all()
         userPicture=[]
-        postUser = User.query.filter_by(openid=order.postID).first()
+        postUser = User.query.filter_by(openid=str(order.postID)).first()
+        # p2User = Post2order.query.filter_by(kind=1,orderID = orderID).first()
+        # postUser = User.query.filter_by(openid=p2User.userID)
         userPicture.append(postUser.headPicture)
+        P2order=Pick2order.query.filter_by(kind=1, orderID=orderID).all()
         for u in P2order:
             us=User.query.filter_by(openid=u.userID).first()
             userPicture.append(us.headpicture)
-        userspicture={
-            'userpictures': userPicture
-        }
+        
         commentss=Comment.query.filter_by(orderbuyID=orderID).all()
         comments=[]
         for c in commentss:
@@ -119,68 +128,73 @@ def order(openid):
 
 
 
-#添加订单,获取订单，加入订单。
-@api.route('/order/car/',methods=['POST'],endpoint="order_car")
+#添加订单.
+@api.route('/order/car/',methods=['POST'],endpoint="add_order_car")
+@User.check
+def order(openid):
+    data=request.get_json()
+    order=Ordercar(postID=openid,datetime=datetime.datetime.utcnow())
+    order.placeB=data.get('placeB')
+    order.placeA=data.get('placeA')
+    order.time=data.get('timeGo')
+    order.numNeed=data.get('numNeed')
+    order.heading=data.get('heading')
+    order.content=data.get('content')
+    order.tel=data.get('tel')
+    order.qq=data.get('qq')
+    order.wecaht=data.get('wechat')
+    #；隔开每一个picture_url
+    #内容非必填
+    #联系方式加入订单三个字段
+    order.numExist=1
+    db.session.add(order)
+    db.session.commit()
+    orderID=order.id
+    P2order = Post2order(kind=2,userID=openid,orderID=orderID)
+    db.session.add(P2order)
+    db.session.commit()
+    return jsonify({
+        'orderID':orderID
+    }),200
+        
+
+@api.route("/order/post/car/",methods=['POST','GET'],endpoint="order_buy")
 @User.check
 def order(openid):
     orderID = request.args.get("orderID",-1,type=int)
-    if request.method=='POST':    
-        if orderID==-1:
-            #添加订单
-            data=request.get_json()
-            order=Ordercar(postID=openid,datetime=datetime.datetime.utcnow())
-            order.placeB=data.get('placeB')
-            order.placeA=data.get('placeA')
-            order.time=data.get('timeGo')
-            order.numNeed=data.get('numNeed')
-            order.heading=data.get('heading')
-            order.content=data.get('content')
-            order.tel=data.get('tel')
-            order.qq=data.get('qq')
-            order.wecaht=data.get('wechat')
-            #；隔开每一个picture_url
-            #内容非必填
-            #联系方式加入订单三个字段
-            order.numExist=1
-            db.session.add(order)
-            db.session.commit()
-            orderID=order.id
-            P2order = Post2order(kind=2,userID=openid,orderID=orderID)
-            db.session.add(P2order)
-            db.session.commit()
-            return jsonify({
-                'orderID':orderID
-            }),200
-        
-        else:
-            #加入订单
-            order = Ordercar.query.filter_by(id=orderID).first()
-            userID = request.json['userID']
-            #保险机制，确保加入订单
-            if userID==openid:
-                if order.numExist >= order.numNeed:
-                    return jsonify({
-                        "msg":"order is full"
-                    }),403
-                
-                if order.postID== str(openid):
-                    return jsonify({
-                        "msg":"you are the poster"
-                    }),403
+    if orderID==-1:
+        return jsonify({
+            "msg":"no orderID"
+        }),401
+    if request.method=='POST':
+        #加入订单
+        order = Ordercar.query.filter_by(id=orderID).first()
+        userID = request.json['userID']
+        #保险机制，确保加入订单
+        if userID==openid:
+            if order.numExist >= order.numNeed:
+                return jsonify({
+                    "msg":"order is full"
+                }),403
+            
+            if order.postID== str(openid):
+                return jsonify({
+                    "msg":"you are the poster"
+                }),403
 
-                if order.postID!= str(openid):
-                    order.numExist+=1
-                    p=Pick2order(kind=2,userID=openid,orderID=orderID)
-                    db.session.add(p,order)
-                    db.session.commit()
-                    way = {
-                        'tel':order.tel,
-                        "wechat":order.wechat,
-                        "qq":order.qq
-                    }
-                    return jsonify({
-                        'way':way
-                    }),200
+            if order.postID!= str(openid):
+                order.numExist+=1
+                p=Pick2order(kind=2,userID=openid,orderID=orderID)
+                db.session.add(p,order)
+                db.session.commit()
+                way = {
+                    'tel':order.tel,
+                    "wechat":order.wechat,
+                    "qq":order.qq
+                }
+                return jsonify({
+                    'way':way
+                }),200
 
    
 
