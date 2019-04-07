@@ -214,7 +214,7 @@ def order_list():
         order={
             'orderbuyID': item.id,
             'heading': item.heading,
-            'timeBuy': item.timeBuy,
+            'timeBuy': item.time,
             'location': item.location,
             'numExist': item.numExist,
             'numNeed' : item.numNeed,
@@ -244,7 +244,7 @@ def order_list():
         order={
         'ordercarID': item.id,
         'heading': item.heading,
-        'timeGo': item.timeGo,
+        'timeGo': item.time,
         'placeA': item.placeA,
         'placeB': item.placeB,
         'numExist': item.numExist,
