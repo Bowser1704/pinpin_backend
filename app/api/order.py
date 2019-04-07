@@ -121,7 +121,11 @@ def order(openid):
             }
             comments.append(x)
 
-        data=[info,userPicture,comments]
+        data={
+            "info":info,
+            "userPicture":userPicture,
+            "comments":comments
+            }
         return jsonify({
             'data':data
         }),200
@@ -158,7 +162,7 @@ def order(openid):
     }),200
         
 
-@api.route("/order/post/car/",methods=['POST','GET'],endpoint="order_buy")
+@api.route("/order/post/car/",methods=['POST','GET'],endpoint="order_car")
 @User.check
 def order(openid):
     orderID = request.args.get("orderID",-1,type=int)
