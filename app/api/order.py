@@ -224,7 +224,7 @@ def order_list():
     data={
         'pageNum': pagination.page,
         'pageMax': pagination.pages,
-        'hasNexe': pagination.has_next,
+        'hasNext': pagination.has_next,
         'ordersnum':pagination.total,
         'orderList':orderlist
     }
@@ -254,7 +254,7 @@ def order_list():
     data={
         'pageNum': pagination.page,
         'pageMax': pagination.pages,
-        'hasNexe': pagination.has_next,
+        'hasNext': pagination.has_next,
         'ordersnum':pagination.total,
         'orderList':orderlist
     }
