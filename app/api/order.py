@@ -218,7 +218,8 @@ def order_list():
             'location': item.location,
             'numExist': item.numExist,
             'numNeed' : item.numNeed,
-            'content' : item.content
+            'content' : item.content,
+            "picture" : item.picture
         }
         orderlist.append(order)
     data={
@@ -311,7 +312,8 @@ def order_list(openid):
                 'location': order.location,
                 'numExist': order.numExist,
                 'numNeed' : order.numNeed,
-                'content' : order.content
+                'content' : order.content,
+                "picture" : order.picture
             }
             orderlist.append(info)
         elif kind==2:
@@ -319,13 +321,13 @@ def order_list(openid):
             order=Ordercar.query.filter_by(id=orderID).first()
             info = {
                 "kind":2,
-                'ordercarID': item.id,
-                'heading': item.heading,
-                'timeGo': item.time,
-                'placeA': item.placeA,
-                'placeB': item.placeB,
-                'numExist': item.numExist,
-                'numNeed' : item.numNeed
+                'ordercarID': order.id,
+                'heading': order.heading,
+                'timeGo': order.time,
+                'placeA': order.placeA,
+                'placeB': order.placeB,
+                'numExist': order.numExist,
+                'numNeed' : order.numNeed
                 }
             orderlist.append(info)
     data={
@@ -360,7 +362,8 @@ def order_list(openid):
                 'location': order.location,
                 'numExist': order.numExist,
                 'numNeed' : order.numNeed,
-                'content' : order.content
+                'content' : order.content,
+                "picture" : order.picture
             }
             orderlist.append(info)
         elif kind==2:
@@ -368,13 +371,13 @@ def order_list(openid):
             order=Ordercar.query.filter_by(id=orderID).first()
             info = {
                 "kind":2,
-                'ordercarID': item.id,
-                'heading': item.heading,
-                'timeGo': item.time,
-                'placeA': item.placeA,
-                'placeB': item.placeB,
-                'numExist': item.numExist,
-                'numNeed' : item.numNeed
+                'ordercarID': order.id,
+                'heading': order.heading,
+                'timeGo': order.time,
+                'placeA': order.placeA,
+                'placeB': order.placeB,
+                'numExist': order.numExist,
+                'numNeed' : order.numNeed
                 }
             orderlist.append(info)
     data={
@@ -409,7 +412,8 @@ def order_list(openid):
                 'location': order.location,
                 'numExist': order.numExist,
                 'numNeed' : order.numNeed,
-                'content' : order.content
+                'content' : order.content,
+                "picture" : item.picture
             }
             orderlist.append(info)
         elif kind==2:
@@ -417,13 +421,13 @@ def order_list(openid):
             order=Ordercar.query.filter_by(id=orderID).first()
             info = {
                 "kind":2,
-                'ordercarID': item.id,
-                'heading': item.heading,
-                'timeGo': item.time,
-                'placeA': item.placeA,
-                'placeB': item.placeB,
-                'numExist': item.numExist,
-                'numNeed' : item.numNeed
+                'ordercarID': order.id,
+                'heading': order.heading,
+                'timeGo': order.time,
+                'placeA': order.placeA,
+                'placeB': order.placeB,
+                'numExist': order.numExist,
+                'numNeed' : order.numNeed
                 }
             orderlist.append(info)
     data={
