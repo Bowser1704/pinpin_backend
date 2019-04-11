@@ -211,6 +211,13 @@ def order_list():
     pagination=Orderbuy.query.filter_by(kind=kind).paginate(page,per_page=10,error_out=False)
     orderlist=[]
     for item in pagination.items:
+        userPicture=[]
+        postUser = User.query.filter_by(openid=str(item.postID)).first()
+        userPicture.append(postUser.headPicture)
+        P2order=Pick2order.query.filter_by(kind=1, orderID=item.id).all()
+        for u in P2order:
+            us=User.query.filter_by(openid=u.userID).first()
+            userPicture.append(us.headpicture)
         order={
             'orderbuyID': item.id,
             'heading': item.heading,
@@ -219,7 +226,8 @@ def order_list():
             'numExist': item.numExist,
             'numNeed' : item.numNeed,
             'content' : item.content,
-            "picture" : item.picture
+            "picture" : item.picture,
+            "userPicture" : userPicture
         }
         orderlist.append(order)
     data={
@@ -304,6 +312,13 @@ def order_list(openid):
         if kind==1:
             orderID = item.orderID
             order=Orderbuy.query.filter_by(id=orderID).first()
+            userPicture=[]
+            postUser = User.query.filter_by(openid=str(order.postID)).first()
+            userPicture.append(postUser.headPicture)
+            P2order=Pick2order.query.filter_by(kind=1, orderID=orderID).all()
+            for u in P2order:
+                us=User.query.filter_by(openid=u.userID).first()
+                userPicture.append(us.headpicture)
             info={
                 "kind":1,
                 'orderbuyID': order.id,
@@ -313,7 +328,8 @@ def order_list(openid):
                 'numExist': order.numExist,
                 'numNeed' : order.numNeed,
                 'content' : order.content,
-                "picture" : order.picture
+                "picture" : order.picture,
+                "userPicture" : userPicture
             }
             orderlist.append(info)
         elif kind==2:
@@ -354,6 +370,13 @@ def order_list(openid):
         if kind==1:
             orderID = item.orderID
             order=Orderbuy.query.filter_by(id=orderID).first()
+            userPicture=[]
+            postUser = User.query.filter_by(openid=str(order.postID)).first()
+            userPicture.append(postUser.headPicture)
+            P2order=Pick2order.query.filter_by(kind=1, orderID=orderID).all()
+            for u in P2order:
+                us=User.query.filter_by(openid=u.userID).first()
+                userPicture.append(us.headpicture)
             info={
                 "kind":1,
                 'orderbuyID': order.id,
@@ -363,7 +386,8 @@ def order_list(openid):
                 'numExist': order.numExist,
                 'numNeed' : order.numNeed,
                 'content' : order.content,
-                "picture" : order.picture
+                "picture" : order.picture,
+                "userPicture" : userPicture
             }
             orderlist.append(info)
         elif kind==2:
@@ -404,6 +428,13 @@ def order_list(openid):
         if kind==1:
             orderID = item.orderbuyID
             order=Orderbuy.query.filter_by(id=orderID).first()
+            userPicture=[]
+            postUser = User.query.filter_by(openid=str(order.postID)).first()
+            userPicture.append(postUser.headPicture)
+            P2order=Pick2order.query.filter_by(kind=1, orderID=orderID).all()
+            for u in P2order:
+                us=User.query.filter_by(openid=u.userID).first()
+                userPicture.append(us.headpicture)
             info={
                 "kind":1,
                 'orderbuyID': order.id,
@@ -413,7 +444,8 @@ def order_list(openid):
                 'numExist': order.numExist,
                 'numNeed' : order.numNeed,
                 'content' : order.content,
-                "picture" : item.picture
+                "picture" : item.picture,
+                "userPicture" : userPicture
             }
             orderlist.append(info)
         elif kind==2:
