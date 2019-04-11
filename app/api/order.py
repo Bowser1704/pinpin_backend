@@ -133,7 +133,7 @@ def order(openid):
 
 
 #添加订单.
-@api.route('/order/car/',methods=['POST'],endpoint="add_order_car")
+@api.route('/order/post/car/',methods=['POST'],endpoint="add_order_car")
 @User.check
 def order(openid):
     data=request.get_json()
@@ -162,7 +162,7 @@ def order(openid):
     }),200
         
 
-@api.route("/order/post/car/",methods=['POST','GET'],endpoint="order_car")
+@api.route("/order/car/",methods=['POST','GET'],endpoint="order_car")
 @User.check
 def order(openid):
     orderID = request.args.get("orderID",-1,type=int)
