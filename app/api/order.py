@@ -284,7 +284,9 @@ def comment(openid):
     #print("I am here!!!!!!!!!!!!!!!")
     userID=request.json.get('userID')
     content=request.json.get('content')
-    if str(userID)==openid:
+    print(userID)
+    print(openid)
+    if str(userID)==str(openid):
         comment=Comment(userID=userID,orderbuyID=orderID,content=content)
         db.session.add(comment)
         db.session.commit()
