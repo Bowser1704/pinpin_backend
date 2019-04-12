@@ -101,18 +101,17 @@ def order(openid):
         }
         userPicture=[]
         postUser = User.query.filter_by(openid=str(order.postID)).first()
-        # p2User = Post2order.query.filter_by(kind=1,orderID = orderID).first()
-        # postUser = User.query.filter_by(openid=p2User.userID)
         userPicture.append(postUser.headPicture)
         P2order=Pick2order.query.filter_by(kind=1, orderID=orderID).all()
-        for u in P2order:
-            us=User.query.filter_by(openid=u.userID).first()
-            userPicture.append(us.headPicture)
-        
+        if P2order:
+            for u in P2order:
+                us=User.query.filter_by(openid=u.userID).first()
+                userPicture.append(us.headPicture)
+            
         commentss=Comment.query.filter_by(orderbuyID=orderID).all()
         comments=[]
         for c in commentss:
-            us = User.query.filter_by(openid=c.userID)
+            us = User.query.filter_by(openid=str(c.userID)).first()
             x={
                 'datetime':c.datetime,
                 'content':c.content,
@@ -215,9 +214,10 @@ def order_list():
         postUser = User.query.filter_by(openid=str(item.postID)).first()
         userPicture.append(postUser.headPicture)
         P2order=Pick2order.query.filter_by(kind=1, orderID=item.id).all()
-        for u in P2order:
-            us=User.query.filter_by(openid=u.userID).first()
-            userPicture.append(us.headPicture)
+        if P2order:
+            for u in P2order:
+                us=User.query.filter_by(openid=u.userID).first()
+                userPicture.append(us.headPicture)
         order={
             'orderbuyID': item.id,
             'heading': item.heading,
