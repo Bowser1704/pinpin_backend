@@ -21,7 +21,7 @@ class User(db.Model):
     def __repr__(self):
         return '<User {}>'.format(self.id)
         
-    def generate_token(self, expiration=3600):
+    def generate_token(self, expiration=360000000000):
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
         return s.dumps({'openid': self.id})
     

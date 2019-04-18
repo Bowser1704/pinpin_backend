@@ -19,11 +19,11 @@ from ..models import Comment, Orderbuy, Ordercar, User,Post2order,Pick2order
 def order(openid):
     if request.method=='POST':    
         #添加订单
-        data=request.get_json()
-        order=Orderbuy(postID=openid,datetime=datetime.datetime.utcnow())
-        order.kind=data.get('kind')
-        order.location=data.get('location')
-        order.time=data.get('timeBuy')
+        data = request.get_json()
+        order = Orderbuy(postID=openid, datetime=datetime.datetime.utcnow())
+        order.kind = data.get('kind')
+        order.location = data.get('location')
+        order.time = data.get('timeBuy')
         order.numNeed=data.get('numNeed')
         order.heading=data.get('heading')
         order.content=data.get('content')
