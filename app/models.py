@@ -23,7 +23,7 @@ class User(db.Model):
         
     def generate_token(self, expiration=360000000000):
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
-        return s.dumps({'openid': self.id})
+        return s.dumps({'openid': self.openid})
     
     def check(f):
         @wraps(f)

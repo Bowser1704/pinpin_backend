@@ -426,44 +426,19 @@ def order_list(openid):
     items=pagination.items
     orderlist=[]
     for item in items:
-        kind=item.kind
-        if kind==1:
-            orderID = item.orderbuyID
-            order=Orderbuy.query.filter_by(id=orderID).first()
-            userPicture=[]
-            postUser = User.query.filter_by(openid=str(order.postID)).first()
-            userPicture.append(postUser.headPicture)
-            P2order=Pick2order.query.filter_by(kind=1, orderID=orderID).all()
-            for u in P2order:
-                us=User.query.filter_by(openid=u.userID).first()
-                userPicture.append(us.headPicture)
-            info={
-                "kind":1,
-                'orderbuyID': order.id,
-                'heading': order.heading,
-                'timeBuy': order.time,
-                'location': order.location,
-                'numExist': order.numExist,
-                'numNeed' : order.numNeed,
-                'content' : order.content,
-                "picture" : item.picture,
-                "userPicture" : userPicture
+        orderID = item.ordercarID
+        order=Ordercar.query.filter_by(id=orderID).first()
+        info = {
+            "kind":2,
+            'ordercarID': order.id,
+            'heading': order.heading,
+            'timeGo': order.time,
+            'placeA': order.placeA,
+            'placeB': order.placeB,
+            'numExist': order.numExist,
+            'numNeed' : order.numNeed
             }
-            orderlist.append(info)
-        elif kind==2:
-            orderID = item.ordercarID
-            order=Ordercar.query.filter_by(id=orderID).first()
-            info = {
-                "kind":2,
-                'ordercarID': order.id,
-                'heading': order.heading,
-                'timeGo': order.time,
-                'placeA': order.placeA,
-                'placeB': order.placeB,
-                'numExist': order.numExist,
-                'numNeed' : order.numNeed
-                }
-            orderlist.append(info)
+        orderlist.append(info)
     data={
         'pageNum': pagination.page,
         'pageMax': pagination.pages,
@@ -540,4 +515,28 @@ def order_list(openid):
 #     else:
 #         return jsonify({
 #             "msg":"openid与userID不同"
-#         })，401
+# #         })，401       kind=item.kind
+#         if kind==1:
+#             orderID = item.orderbuyID
+#             order=Orderbuy.query.filter_by(id=orderID).first()
+#             userPicture=[]
+#             postUser = User.query.filter_by(openid=str(order.postID)).first()
+#             userPicture.append(postUser.headPicture)
+#             P2order=Pick2order.query.filter_by(kind=1, orderID=orderID).all()
+#             for u in P2order:
+#                 us=User.query.filter_by(openid=u.userID).first()
+#                 userPicture.append(us.headPicture)
+#             info={
+#                 "kind":1,
+#                 'orderbuyID': order.id,
+#                 'heading': order.heading,
+#                 'timeBuy': order.time,
+#                 'location': order.location,
+#                 'numExist': order.numExist,
+#                 'numNeed' : order.numNeed,
+#                 'content' : order.content,
+#                 "picture" : item.picture,
+#                 "userPicture" : userPicture
+#             }
+#             orderlist.append(info)
+#         elif kind==2:
