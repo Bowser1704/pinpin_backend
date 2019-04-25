@@ -100,15 +100,17 @@ def order(openid):
             'numNeed': order.numNeed,
             'numExist': order.numExist
         }
-        userPicture = []
+        # userPicture = []
         postUser = User.query.filter_by(openid=str(order.postID)).first()
-        userPicture.append(postUser.headPicture)
-        P2order = Pick2order.query.filter_by(kind=1, orderID=orderID).all()
-        if P2order:
-            for u in P2order:
-                us = User.query.filter_by(openid=u.userID).first()
-                userPicture.append(us.headPicture)
-
+        # userPicture.append(postUser.headPicture)
+        # P2order = Pick2order.query.filter_by(kind=1, orderID=orderID).all()
+        # if P2order:
+        #     for u in P2order:
+        #         us = User.query.filter_by(openid=u.userID).first()
+        #         userPicture.append(us.headPicture)
+        info['user_picture'] = postUser.headPicture
+        info['username'] = postUser.username
+        
         commentss = Comment.query.filter_by(orderbuyID=orderID).all()
         comments = []
         for c in commentss:
@@ -123,7 +125,6 @@ def order(openid):
 
         data = {
             "info": info,
-            "userPicture": userPicture,
             "comments": comments
             }
         return jsonify({
