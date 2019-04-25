@@ -26,6 +26,9 @@ def create_app(config_name):
 
     from .api import api
     app.register_blueprint(api, url_prefix='/api/v1')
+    # api = Api(app, version='1.0', title='ccnupp API',
+    # description='A simple API',
+    # )
     return app
 
 # if __name__ == "__main__":
