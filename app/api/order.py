@@ -91,47 +91,51 @@ def order(openid):
 
     if request.method == "GET":
         order = Orderbuy.query.filter_by(id=orderID).first()
-        info = {
-            'datetime': order.datetime,
-            'kind': order.kind,
-            'location': order.location,
-            'timeBuy': order.time,
-            'picture': order.picture,
-            'heading': order.heading,
-            'content': order.content,
-            'numNeed': order.numNeed,
-            'numExist': order.numExist
-        }
-        # userPicture = []
-        postUser = User.query.filter_by(openid=str(order.postID)).first()
-        # userPicture.append(postUser.headPicture)
-        # P2order = Pick2order.query.filter_by(kind=1, orderID=orderID).all()
-        # if P2order:
-        #     for u in P2order:
-        #         us = User.query.filter_by(openid=u.userID).first()
-        #         userPicture.append(us.headPicture)
-        info['user_picture'] = postUser.headPicture
-        info['username'] = postUser.username
-        
-        commentss = Comment.query.filter_by(orderbuyID=orderID).all()
-        comments = []
-        for c in commentss:
-            us = User.query.filter_by(openid=str(c.userID)).first()
-            x = {
-                'datetime': c.datetime,
-                'content': c.content,
-                'headPicture': us.headPicture,
-                'username': us.username
+        if order:
+            info = {
+                'datetime': order.datetime,
+                'kind': order.kind,
+                'location': order.location,
+                'timeBuy': order.time,
+                'picture': order.picture,
+                'heading': order.heading,
+                'content': order.content,
+                'numNeed': order.numNeed,
+                'numExist': order.numExist
             }
-            comments.append(x)
+            # userPicture = []
+            postUser = User.query.filter_by(openid=str(order.postID)).first()
+            # userPicture.append(postUser.headPicture)
+            # P2order = Pick2order.query.filter_by(kind=1, orderID=orderID).all()
+            # if P2order:
+            #     for u in P2order:
+            #         us = User.query.filter_by(openid=u.userID).first()
+            #         userPicture.append(us.headPicture)
+            info['user_picture'] = postUser.headPicture
+            info['username'] = postUser.username
+            
+            commentss = Comment.query.filter_by(orderbuyID=orderID).all()
+            comments = []
+            for c in commentss:
+                us = User.query.filter_by(openid=str(c.userID)).first()
+                x = {
+                    'datetime': c.datetime,
+                    'content': c.content,
+                    'headPicture': us.headPicture,
+                    'username': us.username
+                }
+                comments.append(x)
 
-        data = {
-            "info": info,
-            "comments": comments
-            }
+            data = {
+                "info": info,
+                "comments": comments
+                }
+            return jsonify({
+                'data': data
+            }), 200
         return jsonify({
-            'data': data
-        }), 200
+            "msg" : 'order is not exist'
+        }),404
 
 
 # 添加订单.

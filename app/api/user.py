@@ -47,7 +47,7 @@ def user_info(openid):
                 'msg': 'no json'
             }), 302
     elif request.method == 'POST':
-        if request.is_josn:
+        if request.is_json:
             us.username = request.json['username']
             us.headPicture = request.json['headPicture']
             db.session.add(us)
