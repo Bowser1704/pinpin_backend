@@ -34,5 +34,5 @@ def create_app(config_name):
 # if __name__ == "__main__":
 app = create_app('config')
 app.app_context().push()
-# db.drop_all()
+#db.drop_all()
 db.create_all()

@@ -72,6 +72,8 @@ def order(openid):
 
             if order.postID != str(openid):
                 order.numExist += 1
+                if order.numExist == order.numNeed:
+                    order.full = 1
                 p = Pick2order(kind=1, userID=openid, orderID=orderID)
                 db.session.add(p, order)
                 db.session.commit()
@@ -188,6 +190,8 @@ def order(openid):
 
             if order.postID != str(openid):
                 order.numExist += 1
+                if order.numExist == order.numNeed:
+                    order.full = 1
                 p = Pick2order(kind=2, userID=openid, orderID=orderID)
                 db.session.add(p, order)
                 db.session.commit()
@@ -205,7 +209,7 @@ def order(openid):
 def order_list():
     kind = request.args.get('kind', 1, type=int)
     page = request.args.get('page', 1, type=int)
-    pagination = Orderbuy.query.filter_by(kind=kind).order_by((Orderbuy.numNeed-Orderbuy.numExist).desc(), Orderbuy.datetime.desc()).paginate(page, per_page=10, error_out=False)
+    pagination = Orderbuy.query.filter_by(kind=kind).order_by(Orderbuy.full, Orderbuy.datetime.desc()).paginate(page, per_page=10, error_out=False)
     orderlist = []
     for item in pagination.items:
         userPicture = []
@@ -245,7 +249,7 @@ def order_list():
 @api.route('/order/car/list/', methods=['GET'], endpoint='order_list1')
 def order_list():
     page = request.args.get('page', 1, type=int)
-    pagination = Ordercar.query.order_by((Ordercar.numNeed-Ordercar.numExist).desc(), Orderbuy.datetime.desc()).paginate(page, per_page=10, error_out=False)
+    pagination = Ordercar.query.order_by(Ordercar.full, Orderbuy.datetime.desc()).paginate(page, per_page=10, error_out=False)
     orderlist = []
     for item in pagination.items:
         order = {

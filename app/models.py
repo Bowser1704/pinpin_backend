@@ -65,6 +65,7 @@ class Order(db.Model):
     heading = db.Column(db.String(20))
     content = db.Column(db.String(120))
     postID = db.Column(db.String(30))
+    full = db.Column(db.Integer)
     # -------
 
 
