@@ -10,7 +10,7 @@ from ..login import get_id
 from ..models import Comment, Orderbuy, Ordercar, User
 
 
-@api.route('/user/info/', methods=['GET', 'PUT'], endpoint='user_info')
+@api.route('/user/info/', methods=['GET', 'PUT','POST'], endpoint='user_info')
 @User.check
 def user_info(openid):
     us = User.query.filter_by(openid=openid).first()
