@@ -215,9 +215,11 @@ def order_list():
     page = request.args.get('page', 1, type=int)
     pagination = Orderbuy.query.filter_by(kind=kind).order_by(Orderbuy.full, Orderbuy.datetime.desc()).paginate(page, per_page=10, error_out=False)
     orderlist = []
+    userPicture = []
     for item in pagination.items:
         postUser = User.query.filter_by(openid=str(item.postID)).first()
-        if postUser:    
+        if postUser:
+            userPicture.append(postUser.headPicture)    
             P2order = Pick2order.query.filter_by(kind=1, orderID=item.id).all()
             if P2order:
                 for u in P2order:
@@ -233,7 +235,7 @@ def order_list():
                 'numNeed': item.numNeed,
                 'content': item.content,
                 "picture": item.picture,
-                "userPicture": postUser.userPicture
+                "userPicture": userPicture
             }
             orderlist.append(order)
     data = {
