@@ -212,27 +212,26 @@ def order_list():
     pagination = Orderbuy.query.filter_by(kind=kind).order_by(Orderbuy.full, Orderbuy.datetime.desc()).paginate(page, per_page=10, error_out=False)
     orderlist = []
     for item in pagination.items:
-        userPicture = []
         postUser = User.query.filter_by(openid=str(item.postID)).first()
-        userPicture.append(postUser.headPicture)
-        P2order = Pick2order.query.filter_by(kind=1, orderID=item.id).all()
-        if P2order:
-            for u in P2order:
-                us = User.query.filter_by(openid=u.userID).first()
-                userPicture.append(us.headPicture)
-        order = {
-            'datetime' : item.datetime,
-            'orderbuyID': item.id,
-            'heading': item.heading,
-            'timeBuy': item.time,
-            'location': item.location,
-            'numExist': item.numExist,
-            'numNeed': item.numNeed,
-            'content': item.content,
-            "picture": item.picture,
-            "userPicture": userPicture
-        }
-        orderlist.append(order)
+        if postUser:    
+            P2order = Pick2order.query.filter_by(kind=1, orderID=item.id).all()
+            if P2order:
+                for u in P2order:
+                    us = User.query.filter_by(openid=u.userID).first()
+                    userPicture.append(us.headPicture)
+            order = {
+                'datetime' : item.datetime,
+                'orderbuyID': item.id,
+                'heading': item.heading,
+                'timeBuy': item.time,
+                'location': item.location,
+                'numExist': item.numExist,
+                'numNeed': item.numNeed,
+                'content': item.content,
+                "picture": item.picture,
+                "userPicture": postUser.userPicture
+            }
+            orderlist.append(order)
     data = {
         'pageNum': pagination.page,
         'pageMax': pagination.pages,
