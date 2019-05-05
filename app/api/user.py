@@ -34,8 +34,6 @@ def user_info(openid):
     elif request.method == 'PUT':
         # data=request.get_json()
         if request.is_json:
-            us.username = request.json['username']
-            us.headPicture = request.json['headPicture']
             us.tel = request.json['tel']
             us.wechat = request.json['wechat']
             us.qq = request.json['qq']
@@ -48,6 +46,30 @@ def user_info(openid):
             return jsonify({
                 'msg': 'no json'
             }), 302
+    elif request.method == 'POST':
+        if request.is_josn:
+            us.username = request.json['username']
+            us.headPicture = request.json['headPicture']
+            db.session.add(us)
+            db.session.commit()
+            return jsonify({
+                'msg': 'OK'
+            }), 200
+        else:
+            return jsonify({
+                'msg': 'no json'
+            }), 302
+
+
+
+
+
+
+
+
+
+
+
 
 # @api.route("/user/<userID>/",methods=['GET'],endpoint='user_info1')
 # @User.check

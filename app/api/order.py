@@ -205,7 +205,7 @@ def order(openid):
 def order_list():
     kind = request.args.get('kind', 1, type=int)
     page = request.args.get('page', 1, type=int)
-    pagination = Orderbuy.query.filter_by(kind=kind).paginate(page, per_page=10, error_out=False)
+    pagination = Orderbuy.query.filter_by(kind=kind).order_by((Orderbuy.numNeed-Orderbuy.numExist).desc(), Orderbuy.datetime.desc()).paginate(page, per_page=10, error_out=False)
     orderlist = []
     for item in pagination.items:
         userPicture = []
@@ -217,6 +217,7 @@ def order_list():
                 us = User.query.filter_by(openid=u.userID).first()
                 userPicture.append(us.headPicture)
         order = {
+            'datetime' : item.datetime,
             'orderbuyID': item.id,
             'heading': item.heading,
             'timeBuy': item.time,
@@ -244,10 +245,11 @@ def order_list():
 @api.route('/order/car/list/', methods=['GET'], endpoint='order_list1')
 def order_list():
     page = request.args.get('page', 1, type=int)
-    pagination = Ordercar.query.paginate(page, per_page=10, error_out=False)
+    pagination = Ordercar.query.order_by((Ordercar.numNeed-Ordercar.numExist).desc(), Orderbuy.datetime.desc()).paginate(page, per_page=10, error_out=False)
     orderlist = []
     for item in pagination.items:
         order = {
+            'datetime' : item.datetime,
             'ordercarID': item.id,
             'heading': item.heading,
             'timeGo': item.time,
