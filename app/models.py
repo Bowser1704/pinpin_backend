@@ -14,6 +14,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     openid = db.Column(db.String(30))
     username = db.Column(db.String(30))
+    userPicture = db.Column(db.String(60))
     stNum = db.Column(db.String(30))
     headPicture = db.Column(db.String(30))
     tel = db.Column(db.String(11))
