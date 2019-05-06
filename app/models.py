@@ -53,7 +53,9 @@ class User(db.Model):
         return decorated_function
 
 
-class Order(db.Model):
+
+
+class Orderbuy(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime)
     time = db.Column(db.String(60))
@@ -68,15 +70,26 @@ class Order(db.Model):
     postID = db.Column(db.String(30))
     full = db.Column(db.Integer)
     # -------
-
-
-class Orderbuy(Order):
     kind = db.Column(db.Integer)
     location = db.Column(db.String(60))
     picture = db.Column(db.String(120))
 
 
-class Ordercar(Order):
+class Ordercar(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    datetime = db.Column(db.DateTime)
+    time = db.Column(db.String(60))
+    # 订单启动时间，可能是购买，可能是出发
+    tel = db.Column(db.String(11), nullable=True)
+    qq = db.Column(db.String(12), nullable=True)
+    wechat = db.Column(db.String(30), nullable=True)
+    numNeed = db.Column(db.Integer)
+    numExist = db.Column(db.Integer)
+    heading = db.Column(db.String(20))
+    content = db.Column(db.String(120))
+    postID = db.Column(db.String(30))
+    full = db.Column(db.Integer)
+    # -------
     placeA = db.Column(db.String(50), index=True)
     placeB = db.Column(db.String(50), index=True)
 

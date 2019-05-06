@@ -319,7 +319,7 @@ def order_list():
 @api.route('/order/car/list/', methods=['GET'], endpoint='order_list1')
 def order_list():
     page = request.args.get('page', 1, type=int)
-    pagination = Ordercar.query.order_by(Ordercar.full, Orderbuy.datetime.desc()).paginate(page, per_page=10, error_out=False)
+    pagination = Ordercar.query.order_by(Ordercar.full, Ordercar.datetime.desc()).paginate(page, per_page=10, error_out=False)
     orderlist = []
     for item in pagination.items:
         order = {
