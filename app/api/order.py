@@ -292,6 +292,7 @@ def order_list():
                 "picture": item.picture,
                 "userPicture": userPicture
             }
+            print(userPicture)
             orderlist.append(order)
     data = {
         'pageNum': pagination.page,
