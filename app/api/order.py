@@ -278,7 +278,8 @@ def order_list():
                     userPicture.append(us.headPicture)
             userPicture = list(set(userPicture))
             while '' in userPicture:
-                userPicture.removw('')
+                userPicture.remove('')
+            print(userPicture)
             order = {
                 'datetime' : item.datetime,
                 'orderbuyID': item.id,
@@ -383,8 +384,9 @@ def order_list(openid):
                 us = User.query.filter_by(openid=u.userID).first()
                 userPicture.append(us.headPicture)
             userPicture = list(set(userPicture))
+            print(userPicture)
             while '' in userPicture:
-                userPicture.removw('')
+                userPicture.remove('')
             info = {
                 "kind": 1,
                 'orderbuyID': order.id,
@@ -445,7 +447,7 @@ def order_list(openid):
                 userPicture.append(us.headPicture)
             userPicture = list(set(userPicture))
             while '' in userPicture:
-                userPicture.removw('')
+                userPicture.remove('')
             info = {
                 "kind": 1,
                 'orderbuyID': order.id,
@@ -504,7 +506,7 @@ def order_list(openid):
             userPicture.append(us.headPicture)
         userPicture = list(set(userPicture))
         while '' in userPicture:
-            userPicture.removw('')
+            userPicture.remove('')
         print(userPicture)
         info = {
             "kind": 1,
