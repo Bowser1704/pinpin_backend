@@ -244,18 +244,15 @@ def order(openid):
                 return jsonify({
                     'way': way
                 }), 200
-
-            if order.numExist >= order.numNeed:
-                return jsonify({
-                    "msg": "order is full"
-                }), 403
-
             if order.postID == str(openid):
                 return jsonify({
                     "msg": "you are the poster"
                 }), 403
-
             
+            if order.numExist >= order.numNeed:
+                return jsonify({
+                    "msg": "order is full"
+                }), 403
 
             if order.postID != str(openid):
                 order.numExist += 1
