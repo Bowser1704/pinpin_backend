@@ -249,7 +249,7 @@ def order(openid):
                     "msg": "you are the poster"
                 }), 403
             
-            if order.numExist >= order.numNeed:
+            if int(order.numExist) >= int(order.numNeed):
                 return jsonify({
                     "msg": "order is full"
                 }), 403
