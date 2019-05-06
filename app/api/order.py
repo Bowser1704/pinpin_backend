@@ -289,7 +289,7 @@ def order_list():
                     userPicture.append(us.headPicture)
             while None in userPicture:
                 userPicture.remove(None)
-            print(userPicture)
+            
             order = {
                 'datetime' : item.datetime,
                 'orderbuyID': item.id,
@@ -516,7 +516,7 @@ def order_list(openid):
         userPicture = list(set(userPicture))
         while None in userPicture:
             userPicture.remove(None)
-        print(userPicture)
+        
         info = {
             "kind": 1,
             'orderbuyID': order.id,
