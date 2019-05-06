@@ -277,7 +277,7 @@ def order_list():
                     us = User.query.filter_by(openid=u.userID).first()
                     userPicture.append(us.headPicture)
             userPicture = list(set(userPicture))
-            while '' in userPicture:
+            while None in userPicture:
                 userPicture.remove('')
             print(userPicture)
             order = {
@@ -385,7 +385,7 @@ def order_list(openid):
                 userPicture.append(us.headPicture)
             userPicture = list(set(userPicture))
             print(userPicture)
-            while '' in userPicture:
+            while None in userPicture:
                 userPicture.remove('')
             info = {
                 "kind": 1,
@@ -446,7 +446,7 @@ def order_list(openid):
                 us = User.query.filter_by(openid=u.userID).first()
                 userPicture.append(us.headPicture)
             userPicture = list(set(userPicture))
-            while '' in userPicture:
+            while None in userPicture:
                 userPicture.remove('')
             info = {
                 "kind": 1,
@@ -505,7 +505,7 @@ def order_list(openid):
             us = User.query.filter_by(openid=u.userID).first()
             userPicture.append(us.headPicture)
         userPicture = list(set(userPicture))
-        while '' in userPicture:
+        while None in userPicture:
             userPicture.remove('')
         print(userPicture)
         info = {
