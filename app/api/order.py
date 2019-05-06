@@ -14,7 +14,7 @@ from ..login import get_id
 from ..models import Comment, Orderbuy, Ordercar, User, Post2order, Pick2order
 
 # 添加订单,获取订单，加入订单。
-@api.route('/order/post/buy/', methods=['POST'], endpoint="add_order_buy")
+@api.route('/order/post/buy/', methods=['POST','PUT'], endpoint="add_order_buy")
 @User.check
 def order(openid):
     if request.method == 'POST':
@@ -43,6 +43,28 @@ def order(openid):
         db.session.commit()
         return jsonify({
             'orderID': orderID
+        }), 200
+    elif request.method == 'PUT':
+        # 更新订单
+        data = request.get_json()
+        order = Orderbuy.query.filter_by(id=orderID).first()
+        order.kind = data.get('kind')
+        order.location = data.get('location')
+        order.time = data.get('timeBuy')
+        order.numNeed = data.get('numNeed')
+        order.heading = data.get('heading')
+        order.content = data.get('content')
+        order.tel = data.get('tel')
+        order.qq = data.get('qq')
+        order.wecaht = data.get('wechat')
+        order.picture = data.get('picture')
+        # ；隔开每一个picture_url
+        # 内容非必填
+        # 联系方式加入订单三个字段
+        db.session.add(order)
+        db.session.commit()
+        return jsonify({
+            'msg': "ok"
         }), 200
 
 
@@ -143,33 +165,52 @@ def order(openid):
 
 
 # 添加订单.
-@api.route('/order/post/car/', methods=['POST'], endpoint="add_order_car")
+@api.route('/order/post/car/', methods=['POST','PUT'], endpoint="add_order_car")
 @User.check
 def order(openid):
-    data = request.get_json()
-    order = Ordercar(postID=openid, datetime=datetime.datetime.utcnow())
-    order.placeB = data.get('placeB')
-    order.placeA = data.get('placeA')
-    order.time = data.get('timeGo')
-    order.numNeed = data.get('numNeed')
-    order.heading = data.get('heading')
-    order.content = data.get('content')
-    order.tel = data.get('tel')
-    order.qq = data.get('qq')
-    order.wecaht = data.get('wechat')
-    # ；隔开每一个picture_url
-    # 内容非必填
-    # 联系方式加入订单三个字段
-    order.numExist = 1
-    db.session.add(order)
-    db.session.commit()
-    orderID = order.id
-    P2order = Post2order(kind=2, userID=openid, orderID=orderID)
-    db.session.add(P2order)
-    db.session.commit()
-    return jsonify({
-        'orderID': orderID
-    }), 200
+    if request.method == 'POST':
+        data = request.get_json()
+        order = Ordercar(postID=openid, datetime=datetime.datetime.utcnow())
+        order.placeB = data.get('placeB')
+        order.placeA = data.get('placeA')
+        order.time = data.get('timeGo')
+        order.numNeed = data.get('numNeed')
+        order.heading = data.get('heading')
+        order.content = data.get('content')
+        order.tel = data.get('tel')
+        order.qq = data.get('qq')
+        order.wecaht = data.get('wechat')
+        # ；隔开每一个picture_url
+        # 内容非必填
+        # 联系方式加入订单三个字段
+        order.numExist = 1
+        db.session.add(order)
+        db.session.commit()
+        orderID = order.id
+        P2order = Post2order(kind=2, userID=openid, orderID=orderID)
+        db.session.add(P2order)
+        db.session.commit()
+        return jsonify({
+            'orderID': orderID
+        }), 200
+    elif request.method == 'PUT':
+        data = request.get_json()
+        orderID = data.get('orderID')
+        order = Ordercar.query.filter_by(id=orderID).first()
+        order.placeB = data.get('placeB')
+        order.placeA = data.get('placeA')
+        order.time = data.get('timeGo')
+        order.numNeed = data.get('numNeed')
+        order.heading = data.get('heading')
+        order.content = data.get('content')
+        order.tel = data.get('tel')
+        order.qq = data.get('qq')
+        order.wecaht = data.get('wechat')
+        db.session.add(order)
+        db.session.commit()
+        return jsonify({
+            "msg" : "OK"
+        }),200
 
 
 @api.route("/order/car/", methods=['POST', 'GET'], endpoint="order_car")
@@ -235,6 +276,8 @@ def order_list():
                 for u in P2order:
                     us = User.query.filter_by(openid=u.userID).first()
                     userPicture.append(us.headPicture)
+            us = set(userPicture)
+            userPicture = list(us)
             order = {
                 'datetime' : item.datetime,
                 'orderbuyID': item.id,
@@ -338,6 +381,8 @@ def order_list(openid):
             for u in P2order:
                 us = User.query.filter_by(openid=u.userID).first()
                 userPicture.append(us.headPicture)
+            us = set(userPicture)
+            userPicture = list(us)
             info = {
                 "kind": 1,
                 'orderbuyID': order.id,
@@ -396,6 +441,8 @@ def order_list(openid):
             for u in P2order:
                 us = User.query.filter_by(openid=u.userID).first()
                 userPicture.append(us.headPicture)
+            us = set(userPicture)
+            userPicture = list(us)
             info = {
                 "kind": 1,
                 'orderbuyID': order.id,
@@ -452,6 +499,8 @@ def order_list(openid):
         for u in P2order:
             us = User.query.filter_by(openid=u.userID).first()
             userPicture.append(us.headPicture)
+        us = set(userPicture)
+        userPicture = list(us)
         info = {
             "kind": 1,
             'orderbuyID': order.id,
