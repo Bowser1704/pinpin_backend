@@ -278,7 +278,7 @@ def order_list():
                     userPicture.append(us.headPicture)
             userPicture = list(set(userPicture))
             while None in userPicture:
-                userPicture.remove('')
+                userPicture.remove(None)
             print(userPicture)
             order = {
                 'datetime' : item.datetime,
@@ -386,7 +386,7 @@ def order_list(openid):
             userPicture = list(set(userPicture))
             print(userPicture)
             while None in userPicture:
-                userPicture.remove('')
+                userPicture.remove(None)
             info = {
                 "kind": 1,
                 'orderbuyID': order.id,
@@ -447,7 +447,7 @@ def order_list(openid):
                 userPicture.append(us.headPicture)
             userPicture = list(set(userPicture))
             while None in userPicture:
-                userPicture.remove('')
+                userPicture.remove(None)
             info = {
                 "kind": 1,
                 'orderbuyID': order.id,
@@ -506,7 +506,7 @@ def order_list(openid):
             userPicture.append(us.headPicture)
         userPicture = list(set(userPicture))
         while None in userPicture:
-            userPicture.remove('')
+            userPicture.remove(None)
         print(userPicture)
         info = {
             "kind": 1,
