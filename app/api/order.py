@@ -82,15 +82,6 @@ def order(openid):
         userID = request.json['userID']
         # 保险机制，确保加入订单
         if str(userID) == openid:
-            if order.numExist >= order.numNeed:
-                return jsonify({
-                    "msg": "order is full"
-                }), 403
-
-            if order.postID == str(openid):
-                return jsonify({
-                    "msg": "you are the poster"
-                }), 403
             pick_user = Pick2order.query.filter_by(kind=1, userID=openid, orderID=orderID).first()
             if pick_user:
                 way = {
@@ -101,6 +92,17 @@ def order(openid):
                 return jsonify({
                     'way': way
                 }), 200
+
+            if order.numExist >= order.numNeed:
+                return jsonify({
+                    "msg": "order is full"
+                }), 403
+
+            if order.postID == str(openid):
+                return jsonify({
+                    "msg": "you are the poster"
+                }), 403
+
             if order.postID != str(openid):
                 order.numExist += 1
                 if order.numExist == order.numNeed:
@@ -232,16 +234,6 @@ def order(openid):
         userID = request.json['userID']
         # 保险机制，确保加入订单
         if userID == openid:
-            if order.numExist >= order.numNeed:
-                return jsonify({
-                    "msg": "order is full"
-                }), 403
-
-            if order.postID == str(openid):
-                return jsonify({
-                    "msg": "you are the poster"
-                }), 403
-
             pick_user = Pick2order.query.filter_by(kind=2,userID=openid,orderID=orderID).first()
             if pick_user:
                 way = {
@@ -252,6 +244,18 @@ def order(openid):
                 return jsonify({
                     'way': way
                 }), 200
+
+            if order.numExist >= order.numNeed:
+                return jsonify({
+                    "msg": "order is full"
+                }), 403
+
+            if order.postID == str(openid):
+                return jsonify({
+                    "msg": "you are the poster"
+                }), 403
+
+            
 
             if order.postID != str(openid):
                 order.numExist += 1
