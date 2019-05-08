@@ -361,6 +361,7 @@ paths:
               - numNeed
               - timeGo 
               - content
+              - heading
             properties:
               placeA:
                 type: string
@@ -377,6 +378,8 @@ paths:
               qq:
                 type: string
               wechat:
+                type: string
+              heading:
                 type: string
       responses:
         200: 
