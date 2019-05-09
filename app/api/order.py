@@ -288,7 +288,7 @@ def order_list():
                 for u in P2order:
                     us = User.query.filter_by(openid=u.userID).first()
                     userPicture.append(us.headPicture)
-            userPicture = list(set(headPicture))
+            userPicture = list(set(userPicture))
             
             order = {
                 'datetime' : item.datetime,
