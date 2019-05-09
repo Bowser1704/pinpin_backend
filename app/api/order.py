@@ -288,8 +288,7 @@ def order_list():
                 for u in P2order:
                     us = User.query.filter_by(openid=u.userID).first()
                     userPicture.append(us.headPicture)
-            while None in userPicture:
-                userPicture.remove(None)
+            userPicture = list(map(userPicture))
             
             order = {
                 'datetime' : item.datetime,
@@ -395,8 +394,7 @@ def order_list(openid):
                 us = User.query.filter_by(openid=u.userID).first()
                 userPicture.append(us.headPicture)
             userPicture = list(set(userPicture))
-            while None in userPicture:
-                userPicture.remove(None)
+            userPicture = list(map(userPicture))
             info = {
                 "kind": 1,
                 'orderbuyID': order.id,
@@ -456,8 +454,7 @@ def order_list(openid):
                 us = User.query.filter_by(openid=u.userID).first()
                 userPicture.append(us.headPicture)
             userPicture = list(set(userPicture))
-            while None in userPicture:
-                userPicture.remove(None)
+            userPicture = list(map(userPicture))
             info = {
                 "kind": 1,
                 'orderbuyID': order.id,
