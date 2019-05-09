@@ -290,7 +290,7 @@ def order_list():
                     userPicture.append(us.headPicture)
             userPicture = list(set(headPicture))
             
-userrder = {
+            order = {
                 'datetime' : item.datetime,
                 'orderbuyID': item.id,
                 'heading': item.heading,
@@ -393,7 +393,6 @@ def order_list(openid):
             for u in P2order:
                 us = User.query.filter_by(openid=u.userID).first()
                 userPicture.append(us.headPicture)
-            userPicture = list(set(userPicture))
             userPicture = list(set(userPicture))
             info = {
                 "kind": 1,
