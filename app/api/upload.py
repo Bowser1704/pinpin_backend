@@ -28,29 +28,34 @@ def allowed_file(filename):
 @api.route('/order/image/', methods=['POST'])
 @User.check
 def image(openid):
-    image = request.files['image']
-    imagename = str(openid) + str(datetime.datetime.utcnow()) + '.' + str(image.filename.rsplit('.', 1)[1])
-    if allowed_file(image.filename):
-        key = imagename
-        access_id = os.environ.get('AL_ACCESS_ID')
-        print('0----->' + str(access_id))
-        access_key = os.environ.get('AL_ACCESS_KEY')
-        print('0----->' + str(access_key))
-        auth = oss2.Auth(access_id, access_key)
-        endpoint = "http://oss-cn-shanghai.aliyuncs.com"
-        bucket = oss2.Bucket(auth, endpoint, 'ccnupp')
+    try:
+        image = request.files['image']
+        imagename = str(openid) + str(datetime.datetime.utcnow()) + '.' + str(image.filename.rsplit('.', 1)[1])
+        if allowed_file(image.filename):
+            key = imagename
+            access_id = os.environ.get('AL_ACCESS_ID')
+            print('0----->' + str(access_id))
+            access_key = os.environ.get('AL_ACCESS_KEY')
+            print('0----->' + str(access_key))
+            auth = oss2.Auth(access_id, access_key)
+            endpoint = "http://oss-cn-shanghai.aliyuncs.com"
+            bucket = oss2.Bucket(auth, endpoint, 'ccnupp')
 
-        path = os.path.join(os.getcwd(), imagename)
-        image.save(path)
-        a = bucket.put_object_from_file(imagename, path)
-        os.remove(path)
-        url = 'https://ccnupp.oss-cn-shanghai.aliyuncs.com/'
-        if a:
-            image_url = url + str(imagename)
+            path = os.path.join(os.getcwd(), imagename)
+            image.save(path)
+            a = bucket.put_object_from_file(imagename, path)
+            os.remove(path)
+            url = 'https://ccnupp.oss-cn-shanghai.aliyuncs.com/'
+            if a:
+                image_url = url + str(imagename)
+                return jsonify({
+                    "image_url": image_url
+                }), 200
+        else:
             return jsonify({
-                "image_url": image_url
-            }), 200
-    else:
+                "msg": "extensions error"
+            }), 403
+    except:
         return jsonify({
-            "msg": "extensions error"
-        }), 403
+            "msg" : "fobidden"
+        }),403
