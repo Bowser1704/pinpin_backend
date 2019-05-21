@@ -32,7 +32,6 @@ def user_info(openid):
             "info": info
         }), 200
     elif request.method == 'PUT':
-        # data=request.get_json()
         if request.is_json:
             us.tel = request.json['tel']
             us.wechat = request.json['wechat']
@@ -60,34 +59,3 @@ def user_info(openid):
                 'msg': 'no json'
             }), 302
 
-
-
-
-
-
-
-
-
-
-
-
-# @api.route("/user/<userID>/",methods=['GET'],endpoint='user_info1')
-# @User.check
-# def user_info(openid,userID):
-#     us=User.query.filter_by(openid=userID).first()
-#     if us is None:
-#         return jsonify({
-#             "msg":"user is not found"
-#         })
-#     info={
-#         "username":us.username,
-#         "headPictur":us.headPictur,
-#         "openid":us.openid,
-#         "stNum": us.stNum,
-#         "wechat" : us.wechat,
-#         "tel":us.tel,
-#         "qq":us.qq
-#     }
-#     return jsonify({
-#         "info": info
-#     }),200

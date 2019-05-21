@@ -34,9 +34,7 @@ def image(openid):
         if allowed_file(image.filename):
             key = imagename
             access_id = os.environ.get('AL_ACCESS_ID')
-            print('0----->' + str(access_id))
             access_key = os.environ.get('AL_ACCESS_KEY')
-            print('0----->' + str(access_key))
             auth = oss2.Auth(access_id, access_key)
             endpoint = "http://oss-cn-shanghai.aliyuncs.com"
             bucket = oss2.Bucket(auth, endpoint, 'ccnupp')
